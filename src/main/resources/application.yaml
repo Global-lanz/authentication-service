@@ -1,0 +1,16 @@
+spring:
+  application:
+    name:
+      AuthenticationService
+  datasource:
+    url: jdbc:postgresql://localhost:5432/sm-user-account
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+authentication:
+  security:
+    enable-https: false
+    basic-user: api
+    basic-password: api
+    origin-allowed: http://localhost:4200
