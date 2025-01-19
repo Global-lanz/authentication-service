@@ -61,13 +61,13 @@ CREATE TABLE IF NOT EXISTS user_group_rule
     CONSTRAINT user_group_rule_rule_id_fk FOREIGN KEY (rule_id) REFERENCES rule (rule_id)
     );
 
-CREATE TABLE IF NOT EXISTS user_account_group
+CREATE TABLE IF NOT EXISTS user_account_user_group
 (
     user_account_id UUID NOT NULL,
     user_group_id UUID NOT NULL,
     PRIMARY KEY (user_account_id, user_group_id),
-    CONSTRAINT user_account_group_user_account_id_fk FOREIGN KEY (user_account_id) REFERENCES user_account (user_account_id),
-    CONSTRAINT user_account_group_user_group_id_fk FOREIGN KEY (user_group_id) REFERENCES user_group (user_group_id)
+    CONSTRAINT user_account_user_account_id_fk FOREIGN KEY (user_account_id) REFERENCES user_account (user_account_id),
+    CONSTRAINT user_account_user_group_id_fk FOREIGN KEY (user_group_id) REFERENCES user_group (user_group_id)
     );
 
 INSERT INTO rule (name, description) VALUES ('CREATE_USER', 'The userAccount can create new users.');

@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -66,8 +67,11 @@ public class UserService implements UserDetailsService {
 
         Authentication auth = getAuthenticationManager().authenticate(usernamePassword);
 
-        if (auth.getPrincipal() instanceof UserAccount userAccount)
+        if (auth.getPrincipal() instanceof UserAccount userAccount) {
+            userAccount.setLastLogin(LocalDateTime.now());
+            userRepository.save(userAccount);
             return tokenService.generateToken(userAccount);
+        }
 
         throw new InternalAuthenticationServiceException("Authentication failed");
     }
@@ -106,4 +110,5 @@ public class UserService implements UserDetailsService {
         if (!PASSWORD_REGEX.matcher(request.password()).matches())
             throw new BadRequestException("exception.password.pattern-does-not-match.title", "exception.password.pattern-does-not-match.message");
     }
+
 }

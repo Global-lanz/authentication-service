@@ -15,9 +15,9 @@ public class HealthCheckService {
 
     public String getDatabaseHealth() {
         if (isDatabaseHealthy())
-            return "Database healthy";
+            return "Database is up and running";
 
-        return "Database unhealthy";
+        return "Database is down";
     }
 
     private boolean isDatabaseHealthy() {

@@ -50,7 +50,6 @@ public class UserAccount implements UserDetails {
     @Column(name = "login_attempts")
     private Integer loginAttempts;
 
-
     @Column(name = "verification_token")
     private String verificationToken;
 
@@ -109,7 +108,7 @@ public class UserAccount implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return lockoutTime == null || LocalDateTime.now().isAfter(lockoutTime);
+        return lockoutTime == null || LocalDateTime.now().isBefore(lockoutTime);
     }
 
     @Override
