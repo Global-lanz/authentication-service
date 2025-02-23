@@ -16,3 +16,10 @@ authentication:
     basic-user: api
     basic-password: api
     origin-allowed: http://localhost:4200
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
