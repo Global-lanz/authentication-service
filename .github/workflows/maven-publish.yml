@@ -2,14 +2,13 @@ name: Generate Swagger Docs and Push to Another Repo
 
 on:
   push:
-    branches:
-      - main  # Ajuste para a branch que deseja monitorar
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   generate-and-push-docs:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
@@ -17,18 +16,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '21'
+          distribution: 'temurin'
+          cache: maven
 
       - name: Build the application
-        run: |
-          ./mvnw clean install
+        run: mvn -B package --file pom.xml  # Usa Maven diretamente
 
       - name: Generate Swagger Documentation
-        run: |
-          ./mvnw springdoc-openapi:generate
+        run: mvn -B springdoc-openapi:generate --file pom.xml  # Usa Maven sem mvnw
 
       - name: Clone target repository
         run: |
