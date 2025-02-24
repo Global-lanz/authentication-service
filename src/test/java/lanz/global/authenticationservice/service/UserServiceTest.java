@@ -46,7 +46,7 @@ public class UserServiceTest {
         RegistrationRequest request = new RegistrationRequest("Name", "Email", "123", "456", "Company", null, null);
         var exception = Assertions.assertThrows(BadRequestException.class, () -> classUnderTest.register(request));
 
-        assertEquals("exception.password.pattern-does-not-match.message", exception.getMessage());
+        assertEquals("exception.password.does-not-match.message", exception.getMessage());
     }
 
     @Test
