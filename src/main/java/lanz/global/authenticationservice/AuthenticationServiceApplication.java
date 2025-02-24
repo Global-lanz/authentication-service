@@ -9,8 +9,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(AuthenticationServiceConfig.class)
 public class AuthenticationServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(AuthenticationServiceApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(AuthenticationServiceApplication.class, args);
+	}
 
 }

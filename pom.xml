@@ -64,6 +64,11 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version> <!-- Verifique a versão mais recente -->
+        </dependency>
 
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -97,6 +102,7 @@
                 </configuration>
             </plugin>
         </plugins>
+
     </build>
 
 </project>
