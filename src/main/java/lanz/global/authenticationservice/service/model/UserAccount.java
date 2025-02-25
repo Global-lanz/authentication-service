@@ -14,14 +14,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -80,7 +78,7 @@ public class UserAccount implements UserDetails {
     private Company company;
 
     @ManyToMany
-    @JoinTable( name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
+    @JoinTable(name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_group_id")})
     private List<UserGroup> userGroups;
 

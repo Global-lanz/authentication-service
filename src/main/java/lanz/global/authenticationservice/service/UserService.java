@@ -1,5 +1,6 @@
 package lanz.global.authenticationservice.service;
 
+import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
@@ -111,4 +112,14 @@ public class UserService implements UserDetailsService {
             throw new BadRequestException("exception.password.pattern-does-not-match.title", "exception.password.pattern-does-not-match.message");
     }
 
+    public void sendInvite(InviteRequest request) {
+        Company company = getUserAccount().getCompany();
+        UserAccount userAccount = new UserAccount();
+        userAccount.setName(request.name());
+        userAccount.setEmail(request.email());
+        userAccount.setCompany(company);
+        userAccount.setCreatedAt(LocalDateTime.now());
+
+        userRepository.save(userAccount);
+    }
 }
