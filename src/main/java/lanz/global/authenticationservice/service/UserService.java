@@ -104,7 +104,7 @@ public class UserService implements UserDetailsService {
     }
 
     private void validatePassword(RegistrationRequest request) throws BadRequestException {
-        if (request.password().equals(request.confirmPassword()))
+        if (!request.password().equals(request.confirmPassword()))
             throw new BadRequestException("exception.password.does-not-match.title", "exception.password.does-not-match.message");
 
         if (!PASSWORD_REGEX.matcher(request.password()).matches())
