@@ -3,6 +3,7 @@ package lanz.global.authenticationservice.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import lanz.global.authenticationservice.service.model.Rule;
 import lanz.global.authenticationservice.service.model.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -42,6 +45,7 @@ public class TokenService {
                     .withIssuer("auth")
                     .withSubject(userAccount.getEmail())
                     .withExpiresAt(getExpireDate())
+                    .withArrayClaim("ROLES", userAccount.getAuthorities().stream().map(Rule::getName).toArray(String[]::new))
                     .sign(algorithm);
         } catch (Exception e) {
             e.printStackTrace();

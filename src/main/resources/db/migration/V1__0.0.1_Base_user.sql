@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS user_account_user_group
     );
 
 INSERT INTO rule (name, description) VALUES ('CREATE_USER', 'The userAccount can create new users.');
-INSERT INTO user_group (name, description) VALUES ('SALES', 'The sales team that will prospect customers.');
+INSERT INTO user_group (name, description) VALUES ('ADMIN', 'The user holds all rules and have access of all functionalities.');
 
 INSERT INTO currency (name, symbol, code)
 VALUES ('US Dollar', '$', 'USD');

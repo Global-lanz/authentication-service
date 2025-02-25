@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -79,7 +80,7 @@ public class UserAccount implements UserDetails {
     private Company company;
 
     @ManyToMany
-    @JoinTable(joinColumns = {@JoinColumn(name = "user_account_id")},
+    @JoinTable( name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_group_id")})
     private List<UserGroup> userGroups;
 
@@ -92,8 +93,9 @@ public class UserAccount implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+    public Collection<Rule> getAuthorities() {
+        return userGroups.stream().flatMap(userGroup -> userGroup.getRules().stream())
+                .toList();
     }
 
     @Override
