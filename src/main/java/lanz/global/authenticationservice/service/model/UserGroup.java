@@ -33,7 +33,7 @@ public class UserGroup {
     private String description;
 
     @ManyToMany
-    @JoinTable(joinColumns = {@JoinColumn(name = "user_group_id")},
+    @JoinTable(name = "user_group_rule", joinColumns = {@JoinColumn(name = "user_group_id")},
             inverseJoinColumns = {@JoinColumn(name = "rule_id")})
     private List<Rule> rules;
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.UUID;
 
@@ -15,7 +16,7 @@ import java.util.UUID;
 @Setter
 @Table
 @Entity(name = "rule")
-public class Rule {
+public class Rule implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,4 +28,9 @@ public class Rule {
 
     @Column(name = "description")
     private String description;
+
+    @Override
+    public String getAuthority() {
+        return name;
+    }
 }

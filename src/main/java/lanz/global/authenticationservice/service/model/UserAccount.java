@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -79,7 +78,7 @@ public class UserAccount implements UserDetails {
     private Company company;
 
     @ManyToMany
-    @JoinTable(joinColumns = {@JoinColumn(name = "user_account_id")},
+    @JoinTable(name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_group_id")})
     private List<UserGroup> userGroups;
 
@@ -92,8 +91,9 @@ public class UserAccount implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+    public Collection<Rule> getAuthorities() {
+        return userGroups.stream().flatMap(userGroup -> userGroup.getRules().stream())
+                .toList();
     }
 
     @Override
