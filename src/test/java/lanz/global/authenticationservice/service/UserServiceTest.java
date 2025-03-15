@@ -3,9 +3,12 @@ package lanz.global.authenticationservice.service;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
+import lanz.global.authenticationservice.repository.RuleRepository;
+import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.service.model.Company;
 import lanz.global.authenticationservice.service.model.UserAccount;
+import lanz.global.authenticationservice.service.model.UserGroup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,6 +33,12 @@ public class UserServiceTest {
 
     @Mock
     UserRepository userRepositoryMock;
+
+    @Mock
+    RuleRepository ruleRepositoryMock;
+
+    @Mock
+    UserGroupRepository userGroupRepositoryMock;
 
     @Mock
     CompanyService companyServiceMock;
@@ -73,6 +83,8 @@ public class UserServiceTest {
         when(userRepositoryMock.findByEmail(anyString())).thenReturn(Optional.empty());
         when(companyServiceMock.register(anyString(), anyString(), any())).thenReturn(new Company());
         when(userRepositoryMock.save(any())).thenReturn(new UserAccount());
+        when(ruleRepositoryMock.findAll()).thenReturn(List.of());
+        when(userGroupRepositoryMock.save(any(UserGroup.class))).thenReturn(new UserGroup());
         when(passwordEncoderMock.encode(anyString())).thenReturn("");
 
         classUnderTest.register(request);

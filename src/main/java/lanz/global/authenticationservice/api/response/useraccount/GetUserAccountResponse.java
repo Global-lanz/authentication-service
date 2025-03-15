@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class UserAccountResponse {
+public class GetUserAccountResponse {
 
 	@Schema(description = "The user account ID")
 	private final UUID userAccountId;
@@ -15,7 +15,7 @@ public class UserAccountResponse {
 	@Schema(description = "The name of the user account ID")
 	private final String name;
 
-	public UserAccountResponse(UserAccount userAccount) {
+	public GetUserAccountResponse(UserAccount userAccount) {
 		this.userAccountId = userAccount.getUserAccountId();
 		this.name = userAccount.getName();
 	}
