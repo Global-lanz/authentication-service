@@ -1,7 +1,9 @@
 package lanz.global.authenticationservice.service.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,6 +19,7 @@ import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -77,10 +80,10 @@ public class UserAccount implements UserDetails {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_group_id")})
-    private List<UserGroup> userGroups;
+    private List<UserGroup> userGroups = new ArrayList<>();
 
     public UserAccount(String name, String email, String encryptedPassword, Company company) {
         setName(name);
@@ -92,7 +95,8 @@ public class UserAccount implements UserDetails {
 
     @Override
     public Collection<Rule> getAuthorities() {
-        return userGroups.stream().flatMap(userGroup -> userGroup.getRules().stream())
+        return userGroups.stream()
+                .flatMap(userGroup -> userGroup.getRules().stream())
                 .toList();
     }
 

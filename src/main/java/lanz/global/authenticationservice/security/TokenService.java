@@ -45,7 +45,7 @@ public class TokenService {
                     .withIssuer("auth")
                     .withSubject(userAccount.getEmail())
                     .withExpiresAt(getExpireDate())
-                    .withArrayClaim("ROLES", userAccount.getAuthorities().stream().map(Rule::getName).toArray(String[]::new))
+                    .withArrayClaim("RULES", userAccount.getAuthorities().stream().map(Rule::getName).toArray(String[]::new))
                     .sign(algorithm);
         } catch (Exception e) {
             e.printStackTrace();

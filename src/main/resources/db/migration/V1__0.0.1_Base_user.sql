@@ -49,7 +49,9 @@ CREATE TABLE IF NOT EXISTS user_group
 (
     user_group_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name        CHARACTER VARYING,
-    description CHARACTER VARYING
+    description CHARACTER VARYING,
+    company_id  UUID              NOT NULL,
+    CONSTRAINT company_fk FOREIGN KEY (company_id) REFERENCES company (company_id)
     );
 
 CREATE TABLE IF NOT EXISTS user_group_rule
@@ -70,8 +72,8 @@ CREATE TABLE IF NOT EXISTS user_account_user_group
     CONSTRAINT user_account_user_group_id_fk FOREIGN KEY (user_group_id) REFERENCES user_group (user_group_id)
     );
 
-INSERT INTO rule (name, description) VALUES ('CREATE_USER', 'The userAccount can create new users.');
-INSERT INTO user_group (name, description) VALUES ('ADMIN', 'The user holds all rules and have access of all functionalities.');
+INSERT INTO rule (name, description) VALUES ('CREATE_USER', 'rule.create-user.description');
+INSERT INTO rule (name, description) VALUES ('LIST_COMPANY_USERS', 'rule.list-company-users.description');
 
 INSERT INTO currency (name, symbol, code)
 VALUES ('US Dollar', '$', 'USD');
