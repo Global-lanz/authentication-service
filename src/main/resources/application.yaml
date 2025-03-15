@@ -1,7 +1,7 @@
 spring:
   application:
     name:
-      AuthenticationService
+      authentication-service
   datasource:
     url: jdbc:postgresql://localhost:5432/sm-user-account
     username: postgres
@@ -16,3 +16,11 @@ authentication:
     basic-user: api
     basic-password: api
     origin-allowed: http://localhost:4200
+
+#Eureka
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8671/eureka

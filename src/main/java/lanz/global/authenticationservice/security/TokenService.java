@@ -13,15 +13,13 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TokenService {
 
-    private final String secret = "segredinho";
+    private final String secret = "3m1nh4Ch4v3Sup3rC0mpL3x4!!123456";
 
     public String validateToken(String token) {
         try {
@@ -46,6 +44,7 @@ public class TokenService {
                     .withSubject(userAccount.getEmail())
                     .withExpiresAt(getExpireDate())
                     .withArrayClaim("RULES", userAccount.getAuthorities().stream().map(Rule::getName).toArray(String[]::new))
+                    .withClaim("companyId", userAccount.getCompany().getCompanyId().toString())
                     .sign(algorithm);
         } catch (Exception e) {
             e.printStackTrace();

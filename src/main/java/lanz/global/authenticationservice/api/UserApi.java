@@ -3,7 +3,6 @@ package lanz.global.authenticationservice.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lanz.global.authenticationservice.api.config.Rules;
@@ -75,7 +74,7 @@ public class UserApi {
         return ResponseEntity.ok(new GetUserAccountResponse(userService.getUserAccount()));
     }
 
-    @RolesAllowed(Rules.CREATE_USER)
+    @RolesAllowed(Rules.INVITE_USER)
     @PostMapping("/invite")
     @Operation(summary = "Invite new user", description = "The endpoint for creating new user accounts to the company of the authenticated user")
     @ApiResponse(responseCode = "200")
