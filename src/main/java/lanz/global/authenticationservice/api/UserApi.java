@@ -56,16 +56,6 @@ public class UserApi {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/currency")
-    @Operation(summary = "Currencies", description = "The endpoint for retrieving the list of currencies")
-    @ApiResponse(responseCode = "200")
-    public ResponseEntity<List<CurrencyResponse>> findCurrencies() {
-        List<CurrencyResponse> currencies = companyService.findAllCurrencies().stream().map(
-                currency -> new CurrencyResponse(currency.getCurrencyId(), currency.getName(), currency.getSymbol(), currency.getCode())
-        ).toList();
-        return ResponseEntity.ok(currencies);
-    }
-
     @GetMapping("/user")
     @Operation(summary = "User account data", description = "The endpoint for retrieving user account data")
     @ApiResponse(responseCode = "200")

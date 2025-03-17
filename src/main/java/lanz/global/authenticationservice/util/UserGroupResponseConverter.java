@@ -1,7 +1,7 @@
 package lanz.global.authenticationservice.util;
 
 import lanz.global.authenticationservice.api.response.useraccount.UserGroupResponse;
-import lanz.global.authenticationservice.service.model.UserGroup;
+import lanz.global.authenticationservice.model.UserGroup;
 import org.springframework.stereotype.Component;
 
 @Component

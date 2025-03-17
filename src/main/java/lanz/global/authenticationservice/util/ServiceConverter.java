@@ -1,7 +1,5 @@
 package lanz.global.authenticationservice.util;
 
-import lanz.global.authenticationservice.service.model.UserAccount;
-import lanz.global.authenticationservice.service.model.UserGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

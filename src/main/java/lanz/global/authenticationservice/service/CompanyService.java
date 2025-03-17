@@ -1,44 +1,36 @@
 package lanz.global.authenticationservice.service;
 
+import jakarta.ws.rs.InternalServerErrorException;
 import lanz.global.authenticationservice.exception.BadRequestException;
-import lanz.global.authenticationservice.repository.CompanyRepository;
-import lanz.global.authenticationservice.repository.CurrencyRepository;
-import lanz.global.authenticationservice.service.model.Company;
-import lanz.global.authenticationservice.service.model.Currency;
+import lanz.global.authenticationservice.external.api.company.request.CreateCompanyRequest;
+import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CompanyService {
 
-    private final CompanyRepository companyRepository;
-    private final CurrencyRepository currencyRepository;
+    private final RestTemplate restTemplate;
 
-    public List<Currency> findAllCurrencies() {
-        return currencyRepository.findAll();
-    }
+    String URL = "https://COMPANY-SERVICE:8082/company";
 
-    public Company register(String name, String country, UUID currencyId) throws BadRequestException {
-        Currency currency = findCurrencyById(currencyId);
+    public UUID createCompany(String name, String country, UUID currencyId) throws BadRequestException {
+        CreateCompanyRequest request = new CreateCompanyRequest(name, country, currencyId);
 
-        Company company = new Company();
-        company.setName(name);
-        company.setCountry(country);
-        company.setCurrency(currency);
-        return companyRepository.save(company);
-    }
+        ResponseEntity<CompanyResponse> response = restTemplate.postForEntity(URL, request, CompanyResponse.class);
 
-    public Currency findCurrencyById(UUID currencyId) throws BadRequestException {
-        if (currencyId == null) {
-            return null;
-        }
-
-        return currencyRepository.findById(currencyId).orElseThrow(() -> new BadRequestException("exception.not-found.title", "exception.not-found.message", "Currency"));
+        return switch (response.getStatusCode()) {
+            case HttpStatus.OK -> response.getBody().companyId();
+            case HttpStatus.BAD_REQUEST -> throw new BadRequestException("exception.create-bad-request.title", "exception.create-bad-request.message", "Company");
+            case null, default -> throw new InternalServerErrorException();
+        };
     }
 
 }
