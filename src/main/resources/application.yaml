@@ -1,26 +1,9 @@
 spring:
   application:
-    name:
-      authentication-service
-  datasource:
-    url: jdbc:postgresql://localhost:5432/sm-user-account
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-  messages:
-    basename: lang/messages
-
-authentication:
-  security:
-    enable-https: false
-    basic-user: api
-    basic-password: api
-    origin-allowed: http://localhost:4200
-
-#Eureka
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8671/eureka
+    name: authentication-service
+  config:
+    import: optional:configserver:http://localhost:8083/
+  cloud:
+    config:
+      discovery:
+        enabled: true
