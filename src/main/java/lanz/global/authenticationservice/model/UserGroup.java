@@ -1,4 +1,4 @@
-package lanz.global.authenticationservice.service.model;
+package lanz.global.authenticationservice.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,9 +35,8 @@ public class UserGroup {
     @Column(name = "description")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @Column(name = "company_id")
+    private UUID companyId;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_group_rule", joinColumns = {@JoinColumn(name = "user_group_id")},
@@ -46,9 +44,9 @@ public class UserGroup {
     private List<Rule> rules;
 
 
-    public UserGroup(String name, String description, Company company) {
+    public UserGroup(String name, String description, UUID companyId) {
         this.name = name;
         this.description = description;
-        this.company = company;
+        this.companyId = companyId;
     }
 }

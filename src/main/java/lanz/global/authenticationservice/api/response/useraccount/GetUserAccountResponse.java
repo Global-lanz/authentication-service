@@ -1,7 +1,7 @@
 package lanz.global.authenticationservice.api.response.useraccount;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lanz.global.authenticationservice.service.model.UserAccount;
+import lanz.global.authenticationservice.model.UserAccount;
 import lombok.Getter;
 
 import java.util.UUID;

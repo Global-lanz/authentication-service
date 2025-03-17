@@ -9,10 +9,9 @@ import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.security.TokenService;
-import lanz.global.authenticationservice.service.model.Company;
-import lanz.global.authenticationservice.service.model.Rule;
-import lanz.global.authenticationservice.service.model.UserAccount;
-import lanz.global.authenticationservice.service.model.UserGroup;
+import lanz.global.authenticationservice.model.Rule;
+import lanz.global.authenticationservice.model.UserAccount;
+import lanz.global.authenticationservice.model.UserGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -70,9 +69,9 @@ public class UserService implements UserDetailsService {
     public UUID register(RegistrationRequest request) throws BadRequestException {
         validateCreateUser(request);
 
-        Company company = companyService.register(request.companyName(), request.country(), request.currencyId());
+        UUID companyId = companyService.createCompany(request.companyName(), request.country(), request.currencyId());
 
-        UserAccount userAccount = new UserAccount(request.name(), request.email(), encrypt(request.password()), company);
+        UserAccount userAccount = new UserAccount(request.name(), request.email(), encrypt(request.password()), companyId);
 
         userAccount.setUserGroups(createInitialUserGroups(userAccount));
 
@@ -101,11 +100,11 @@ public class UserService implements UserDetailsService {
     public void sendInvite(InviteRequest request) {
         validateInviteUser(request);
 
-        Company company = getCompanyFromAuthenticatedUser();
+        UUID companyId = getCompanyFromAuthenticatedUser();
         UserAccount userAccount = new UserAccount();
         userAccount.setName(request.name());
         userAccount.setEmail(request.email());
-        userAccount.setCompany(company);
+        userAccount.setCompanyId(companyId);
         userAccount.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(userAccount);
@@ -113,13 +112,13 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
-        return userRepository.findAllByCompany(getCompanyFromAuthenticatedUser());
+        return userRepository.findAllByCompanyId(getCompanyFromAuthenticatedUser());
     }
 
     private List<UserGroup> createInitialUserGroups(UserAccount userAccount) {
         List<UserGroup> userGroups = new ArrayList<>();
 
-        UserGroup userGroup = new UserGroup("ADMIN", "user-group.admin.description", userAccount.getCompany());
+        UserGroup userGroup = new UserGroup("ADMIN", "user-group.admin.description", userAccount.getCompanyId());
         userGroup.setRules(getInitialUserRules());
         UserGroup savedUserGroup = userGroupRepository.save(userGroup);
 
@@ -165,7 +164,7 @@ public class UserService implements UserDetailsService {
         validateUserAlreadyExists(request.email());
     }
 
-    private Company getCompanyFromAuthenticatedUser() {
-        return getUserAccount().getCompany();
+    private UUID getCompanyFromAuthenticatedUser() {
+        return getUserAccount().getCompanyId();
     }
 }

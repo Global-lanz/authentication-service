@@ -3,7 +3,6 @@ package lanz.global.authenticationservice.api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lanz.global.authenticationservice.api.config.Rules;
@@ -57,16 +56,6 @@ public class UserApi {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/currency")
-    @Operation(summary = "Currencies", description = "The endpoint for retrieving the list of currencies")
-    @ApiResponse(responseCode = "200")
-    public ResponseEntity<List<CurrencyResponse>> findCurrencies() {
-        List<CurrencyResponse> currencies = companyService.findAllCurrencies().stream().map(
-                currency -> new CurrencyResponse(currency.getCurrencyId(), currency.getName(), currency.getSymbol(), currency.getCode())
-        ).toList();
-        return ResponseEntity.ok(currencies);
-    }
-
     @GetMapping("/user")
     @Operation(summary = "User account data", description = "The endpoint for retrieving user account data")
     @ApiResponse(responseCode = "200")
@@ -75,7 +64,7 @@ public class UserApi {
         return ResponseEntity.ok(new GetUserAccountResponse(userService.getUserAccount()));
     }
 
-    @RolesAllowed(Rules.CREATE_USER)
+    @RolesAllowed(Rules.INVITE_USER)
     @PostMapping("/invite")
     @Operation(summary = "Invite new user", description = "The endpoint for creating new user accounts to the company of the authenticated user")
     @ApiResponse(responseCode = "200")

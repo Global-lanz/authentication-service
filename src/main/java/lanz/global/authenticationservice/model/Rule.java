@@ -1,4 +1,4 @@
-package lanz.global.authenticationservice.service.model;
+package lanz.global.authenticationservice.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

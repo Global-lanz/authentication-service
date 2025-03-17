@@ -1,4 +1,4 @@
-package lanz.global.authenticationservice.service.model;
+package lanz.global.authenticationservice.model;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -76,20 +75,19 @@ public class UserAccount implements UserDetails {
     @Column(name = "oauth_id")
     private String oauthId;
 
-    @ManyToOne
-    @JoinColumn(name = "company_id")
-    private Company company;
+    @Column(name = "company_id")
+    private UUID companyId;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinTable(name = "user_account_user_group", joinColumns = {@JoinColumn(name = "user_account_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_group_id")})
     private List<UserGroup> userGroups = new ArrayList<>();
 
-    public UserAccount(String name, String email, String encryptedPassword, Company company) {
+    public UserAccount(String name, String email, String encryptedPassword, UUID companyId) {
         setName(name);
         setEmail(email);
         setPassword(encryptedPassword);
-        setCompany(company);
+        setCompanyId(companyId);
         setCreatedAt(LocalDateTime.now());
     }
 

@@ -1,18 +1,9 @@
 spring:
   application:
-    name:
-      AuthenticationService
-  datasource:
-    url: jdbc:postgresql://localhost:5432/sm-user-account
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-  messages:
-    basename: lang/messages
-
-authentication:
-  security:
-    enable-https: false
-    basic-user: api
-    basic-password: api
-    origin-allowed: http://localhost:4200
+    name: authentication-service
+  config:
+    import: optional:configserver:http://localhost:8180/
+  cloud:
+    config:
+      discovery:
+        enabled: true
