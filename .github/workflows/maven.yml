@@ -28,13 +28,14 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    # Passo 2: Extrair a versão do pom.xml
-    - name: Get version from pom.xml
-      id: get_version
+     # Passo 2: Instalar xmllint e extrair a versão do pom.xml
+    - name: Install xmllint and extract version from pom.xml
       run: |
+        sudo apt-get update
+        sudo apt-get install -y libxml2-utils  # Instala xmllint
         VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
         echo "Version from pom.xml: $VERSION"
-        echo "version=$VERSION" >> $GITHUB_ENV        
+        echo "version=$VERSION" >> $GITHUB_ENV
 
     - name: Build with Maven and Deploy into Docker Hub
       run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ env.version }}" --file pom.xml
