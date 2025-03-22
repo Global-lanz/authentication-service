@@ -33,4 +33,6 @@ jobs:
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
     - name: Build with Maven and Deploy into Docker Hub
       run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=maiconlanzendorf/authentication-service" --file pom.xml
+    - name: Docker Hub Push images
+      run: docker push maiconlanzendorf/authentication-service
 
