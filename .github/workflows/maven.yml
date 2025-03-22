@@ -6,18 +6,18 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Generate Final Version
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-publish:
     permissions: write-all
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: maiconlanzendorf/authentication-service
 
     steps:
     - uses: actions/checkout@v4
@@ -27,8 +27,21 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+
+    # Passo 2: Extrair a versão do pom.xml
+    - name: Get version from pom.xml
+      id: get_version
+      run: |
+        VERSION=$(xmllint --xpath "string(//project/version)" pom.xml)
+        echo "Version from pom.xml: $VERSION"
+        echo "version=$VERSION" >> $GITHUB_ENV        
+
+    - name: Build with Maven and Deploy into Docker Hub
+      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ env.version }}" --file pom.xml
+   
+    # 4️⃣ Faz push da imagem Docker para o Docker Hub
+    - name: Push Docker Image
+      run: docker push ${{ env.IMAGE_NAME }}:${{ env.version }}
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
