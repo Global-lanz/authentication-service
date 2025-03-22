@@ -60,7 +60,7 @@ jobs:
 
     - name: Build with Maven
       if: ${{ !contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
+      run: mvn -B package --file pom.xml
    
     # 4️⃣ Faz push da imagem Docker para o Docker Hub
     - name: Push Docker Image with RC Tag
