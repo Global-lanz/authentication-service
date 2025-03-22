@@ -19,7 +19,7 @@ public class CompanyService {
 
     private final RestTemplate restTemplate;
 
-    String URL = "https://COMPANY-SERVICE:8082/company";
+    String URL = "http://company-service:80/company";
 
     public UUID createCompany(String name, String country, UUID currencyId) throws BadRequestException {
         CreateCompanyRequest request = new CreateCompanyRequest(name, country, currencyId);
