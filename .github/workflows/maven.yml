@@ -37,6 +37,15 @@ jobs:
         echo "Version from pom.xml: $VERSION"
         echo "version=$VERSION" >> $GITHUB_ENV
 
+    # Passo 3: Extrair a versão do pom.xml com Maven
+    - name: Get version from pom.xml using Maven
+      id: get_version
+      run: |
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "Version from pom.xml: $VERSION"
+        echo "version=$VERSION" >> $GITHUB_ENV
+
+
     - name: Build with Maven and Deploy into Docker Hub
       run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ env.version }}" --file pom.xml
    
