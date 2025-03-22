@@ -5,16 +5,20 @@ name: Publish Release
 
 on:
   release:
-    types: [created]
+    types: [created, opened, synchronize, labeled, unlabeled]
   pull_request:
     branches: [ "main" ]
 
 jobs:
-  build-and-deploy:
+  build-and-deploy-rc:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write        # necessário para criar tags
+      pull-requests: write   # necessário para comentar no PR
       packages: write
+
+    env:
+      IMAGE_NAME: maiconlanzendorf/authentication-service
 
     steps:
     - uses: actions/checkout@v4
@@ -24,15 +28,61 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+
+    #############################################
+    # 🚀 Só gera RC se o PR tiver a label RC
+    #############################################
+    - name: Generate RC Version
+      id: rc_version
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+      run: |
+        DATE=$(date +'%Y%m%d')
+
+        EXISTING_TAGS=$(git ls-remote --tags origin "refs/tags/RC.${DATE}.*" | wc -l)
+
+        COUNT=$(printf "%03d" $((EXISTING_TAGS + 1)))
+
+        RC_VERSION="RC.${DATE}.${COUNT}"
+
+        echo "RC Version: $RC_VERSION"
+        echo "rc_version=$RC_VERSION" >> $GITHUB_OUTPUT
+
     - name: Login to Docker Hub
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+   
     - name: Build with Maven and Deploy into Docker Hub
-      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=maiconlanzendorf/authentication-service" --file pom.xml
-    - name: Docker Hub Push images
-      run: docker push maiconlanzendorf/authentication-service
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
 
+    - name: Build with Maven
+      if: ${{ !contains(github.event.pull_request.labels.*.name, 'RC') }}
+      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
+   
+    # 4️⃣ Faz push da imagem Docker para o Docker Hub
+    - name: Push Docker Image with RC Tag
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+      run: docker push $IMAGE_NAME:${{ steps.rc_version.outputs.rc_version }}
+
+    # 5️⃣ (Opcional) Cria a tag RC no GitHub
+    - name: Create Git Tag
+      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        git tag ${{ steps.rc_version.outputs.rc_version }}
+        git push origin ${{ steps.rc_version.outputs.rc_version }}
+
+    # 6️⃣ Comenta no PR com a versão RC criada
+    - name: Comment RC Version on PR
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        message: |
+          🚀 Nova versão Release Candidate criada: `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}`
+          
+          📦 Docker image publicada:
+          `docker pull $IMAGE_NAME:${{ steps.rc_version.outputs.rc_version }}`
