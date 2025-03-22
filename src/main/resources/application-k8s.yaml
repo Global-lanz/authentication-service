@@ -1,0 +1,33 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: authentication-service
+  datasource:
+    url: jdbc:postgresql://postgres:5432/sm-user-account
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  messages:
+    basename: lang/messages
+  cloud:
+    config:
+      discovery:
+        enabled: false
+    kubernetes:
+      discovery:
+        enabled: true
+
+#Eureka
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    enabled: false
+
+authentication-service:
+  url: http://authentication-service
+company-service:
+  url: http://company-service
+customer-service:
+  url: http://customer-service
