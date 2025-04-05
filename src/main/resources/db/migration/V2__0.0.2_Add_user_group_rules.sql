@@ -1,0 +1,10 @@
+INSERT INTO rule (name, description) VALUES ('CREATE_USER_GROUP', 'rule.create-user-group.description');
+INSERT INTO rule (name, description) VALUES ('LIST_USER_GROUPS', 'rule.list-user-groups.description');
+INSERT INTO rule (name, description) VALUES ('GET_USER_GROUP', 'rule.get-user-group.description');
+INSERT INTO rule (name, description) VALUES ('UPDATE_USER_GROUP', 'rule.update-user-group.description');
+INSERT INTO rule (name, description) VALUES ('LINK_USER_ACCOUNT_USER_GROUP', 'rule.link-user-account-user-group.description');
+INSERT INTO rule (name, description) VALUES ('UNLINK_USER_ACCOUNT_USER_GROUP', 'rule.unlink-user-account-user-group.description');
+INSERT INTO rule (name, description) VALUES ('LIST_RULES', 'rule.list-rules.description');
+INSERT INTO rule (name, description) VALUES ('LINK_RULE_USER_GROUP', 'rule.link-rule-user-group.description');
+INSERT INTO rule (name, description) VALUES ('UNLINK_RULE_USER_GROUP', 'rule.unlink-rule-user-group.description');
+INSERT INTO rule (name, description) VALUES ('LIST_USER_GROUP_RULES', 'rule.list-user-group-rules.description');

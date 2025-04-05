@@ -9,39 +9,42 @@ import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
-import lanz.global.authenticationservice.api.response.currency.CurrencyResponse;
+import lanz.global.authenticationservice.api.request.usergroup.LinkUserAccountToUserGroupsRequest;
 import lanz.global.authenticationservice.api.response.login.LoginResponse;
+import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUserAccountResponse;
 import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUserAccountsResponse;
 import lanz.global.authenticationservice.api.response.useraccount.GetUserAccountResponse;
-import lanz.global.authenticationservice.service.CompanyService;
+import lanz.global.authenticationservice.service.UserGroupService;
 import lanz.global.authenticationservice.service.UserService;
-import lanz.global.authenticationservice.util.ServiceConverter;
+import lanz.global.authenticationservice.util.converter.ServiceConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.List;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/authentication")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserApi {
 
     private final UserService userService;
-    private final CompanyService companyService;
+    private final UserGroupService userGroupService;
     private final ServiceConverter serviceConverter;
 
     @PostMapping("/register")
     @ApiResponse(responseCode = "200", description = "User has been created")
     @ApiResponse(responseCode = "400", description = "Bad request")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationRequest request) throws Exception {
+    public ResponseEntity<Void> register(@Valid @RequestBody RegistrationRequest request) {
         UUID userId = userService.register(request);
         return ResponseEntity.created(URI.create("/user/" + userId)).build();
     }
@@ -56,7 +59,7 @@ public class UserApi {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/user-data")
     @Operation(summary = "User account data", description = "The endpoint for retrieving user account data")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "401", description = "The user is not authenticated")
@@ -65,14 +68,14 @@ public class UserApi {
     }
 
     @RolesAllowed(Rules.INVITE_USER)
-    @PostMapping("/invite")
+    @PostMapping("/user/invite")
     @Operation(summary = "Invite new user", description = "The endpoint for creating new user accounts to the company of the authenticated user")
     @ApiResponse(responseCode = "200")
     @ApiResponse(responseCode = "401", description = "The user is not authenticated")
     public ResponseEntity<String> inviteNewUser(@Schema(description = "The request body")
                                                 @Valid
                                                 @RequestBody
-                                                InviteRequest request) throws Exception {
+                                                InviteRequest request) throws URISyntaxException {
         userService.sendInvite(request);
         return ResponseEntity.created(new URI("")).build();
     }
@@ -81,8 +84,34 @@ public class UserApi {
     @GetMapping("/company/user")
     public ResponseEntity<GetCompanyUserAccountsResponse> getUserAccountsFromCurrentCompany() {
         GetCompanyUserAccountsResponse response = new GetCompanyUserAccountsResponse();
-        response.userAccounts = serviceConverter.convertList(userService.getUserAccountsFromCurrentCompany());
+        response.userAccounts = serviceConverter.convertList(userService.getUserAccountsFromCurrentCompany(), GetCompanyUserAccountResponse.class);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/user/{userId}/user-group")
+    @RolesAllowed(Rules.LINK_USER_ACCOUNT_USER_GROUP)
+    @Operation(summary = "Link user account to a list of user groups", description = "The endpoint links an user account to the list of user groups")
+    @ApiResponse(responseCode = "200", description = "User account linked to the user groups")
+    @ApiResponse(responseCode = "401", description = "The user is not authenticated")
+    public ResponseEntity<Void> linkUserAccountToUserGroups(@PathVariable("userId") UUID userId,
+                                                            @Schema(description = "The request body")
+                                                            @Valid
+                                                            @RequestBody LinkUserAccountToUserGroupsRequest request) {
+        userGroupService.linkUserAccountToUserGroups(userId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/user/{userId}/user-group")
+    @RolesAllowed(Rules.UNLINK_USER_ACCOUNT_USER_GROUP)
+    @Operation(summary = "Unlink user account to a list of user groups", description = "The endpoint unlinks the user account to the list of user groups")
+    @ApiResponse(responseCode = "200", description = "User account removed from user groups")
+    @ApiResponse(responseCode = "401", description = "The user is not authenticated")
+    public ResponseEntity<Void> unlinkUserAccountToUserGroups(@PathVariable("userId") UUID userId,
+                                                              @Schema(description = "The request body")
+                                                              @Valid
+                                                              @RequestBody LinkUserAccountToUserGroupsRequest request) {
+        userGroupService.unlinkUserAccountToUserGroups(userId, request);
+        return ResponseEntity.noContent().build();
     }
 }

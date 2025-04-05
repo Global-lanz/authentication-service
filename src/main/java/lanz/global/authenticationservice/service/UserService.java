@@ -4,14 +4,15 @@ import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
+import lanz.global.authenticationservice.exception.NotFoundException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
+import lanz.global.authenticationservice.model.Rule;
+import lanz.global.authenticationservice.model.UserAccount;
+import lanz.global.authenticationservice.model.UserGroup;
 import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.security.TokenService;
-import lanz.global.authenticationservice.model.Rule;
-import lanz.global.authenticationservice.model.UserAccount;
-import lanz.global.authenticationservice.model.UserGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -75,7 +76,11 @@ public class UserService implements UserDetailsService {
 
         userAccount.setUserGroups(createInitialUserGroups(userAccount));
 
-        return userRepository.save(userAccount).getUserAccountId();
+        UserAccount saveduser = userRepository.save(userAccount);
+
+        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail());
+
+        return saveduser.getUserAccountId();
     }
 
     public String login(LoginRequest request) throws AuthenticationException {
@@ -108,7 +113,7 @@ public class UserService implements UserDetailsService {
         userAccount.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(userAccount);
-        notificationService.sendNotification("The invite has been sent to %s.", userAccount.getName());
+        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail());
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
@@ -164,7 +169,15 @@ public class UserService implements UserDetailsService {
         validateUserAlreadyExists(request.email());
     }
 
-    private UUID getCompanyFromAuthenticatedUser() {
+    public UUID getCompanyFromAuthenticatedUser() {
         return getUserAccount().getCompanyId();
+    }
+
+    public UserAccount findUserAccountById(UUID userId) {
+        return userRepository.findByUserAccountIdAndCompanyId(userId, getCompanyFromAuthenticatedUser()).orElseThrow(() -> new NotFoundException("User Account"));
+    }
+
+    public void update(UserAccount userAccount) {
+        userRepository.save(userAccount);
     }
 }
