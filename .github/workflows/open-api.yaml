@@ -1,9 +1,9 @@
 name: Generate OpenAPI Spec
 
 on:
-  pull_request:
-    types: [opened, synchronize, labeled, unlabeled]
-    branches: ["main"]
+  push:
+    branches:
+      - "main"
 
 jobs:
   generate-openapi:
@@ -29,10 +29,20 @@ jobs:
       - name: Build application
         run: ./mvnw clean package -DskipTests
 
-      - name: Run app in background
+      - name: Run app in background (on port 8080)
         run: |
-          nohup java -Dserver.port=8080 -jar target/*.jar > app.log 2>&1 &
-          sleep 60  # Aumenta o tempo de espera
+          java -Dserver.port=8080 -jar target/*.jar > app.log 2>&1 &  # Rodando no background sem nohup
+          sleep 60  # Espera de 60 segundos para garantir que o servidor tenha tempo de inicializar
+
+      - name: Check if app is up and running
+        run: |
+          # Verifica se a aplicação está ativa antes de fazer o curl
+          if curl --max-time 30 http://localhost:8080/; then
+            echo "App is running on port 8080"
+          else
+            echo "App is not running on port 8080"
+            exit 1  # Isso vai fazer com que o workflow falhe se o serviço não estiver rodando
+          fi
 
       - name: Fetch OpenAPI JSON
         run: curl http://localhost:8080/v3/api-docs -o openapi.json
