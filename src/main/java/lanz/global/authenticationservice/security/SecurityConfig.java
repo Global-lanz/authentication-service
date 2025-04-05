@@ -31,9 +31,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/currency").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/authentication/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/authentication/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/authentication/currency").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health-check/**").permitAll()
                         .anyRequest().authenticated()
                 )
