@@ -46,6 +46,9 @@ public class UserServiceTest {
     @Mock
     PasswordEncoder passwordEncoderMock;
 
+    @Mock
+    NotificationService notificationServiceMock;
+
     @BeforeEach
     void setUp() {
         openMocks(this);
@@ -90,5 +93,6 @@ public class UserServiceTest {
         classUnderTest.register(request);
 
         verify(userRepositoryMock).save(any());
+        verify(notificationServiceMock).sendNewUserEmail("Name", "Email");
     }
 }
