@@ -1,11 +1,9 @@
 name: Generate OpenAPI Spec
 
 on:
-#  push:
-#    branches: [main]
   pull_request:
     types: [opened, synchronize, labeled, unlabeled]
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   generate-openapi:
@@ -36,16 +34,10 @@ jobs:
       - name: Fetch OpenAPI JSON
         run: curl http://localhost:8080/v3/api-docs -o openapi.json
 
-      - name: Upload openapi.json
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: openapi-spec
-          path: openapi.json
-
       - name: Clone swagger repo
         run: git clone https://github.com/Global-lanz/documentation.github.io.git swagger-docs
 
-      - name: Copy OpenAPI to docs repo
+      - name: Copy OpenAPI to docs repo and commit
         run: |
           cp openapi.json swagger-docs/openapi/${{ env.IMAGE_NAME }}.json
           cd swagger-docs
