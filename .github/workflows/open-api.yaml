@@ -36,7 +36,7 @@ jobs:
         run: curl http://localhost:8080/v3/api-docs -o openapi.json
 
       - name: Upload openapi.json
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.3
         with:
           name: openapi-spec
           path: openapi.json
