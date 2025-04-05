@@ -5,7 +5,7 @@ name: Build and Publish Release
 
 on:
   pull_request:
-    types: [created, opened, synchronize, labeled, unlabeled]
+    types: [opened, synchronize, labeled, unlabeled]
     branches: [ "main" ]
 
 jobs:

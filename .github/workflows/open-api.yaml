@@ -1,0 +1,55 @@
+name: Generate OpenAPI Spec
+
+on:
+#  push:
+#    branches: [main]
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+    branches: [ "main" ]
+
+jobs:
+  generate-openapi:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: maiconlanzendorf/authentication-service
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build application
+        run: ./mvnw clean package -DskipTests
+
+      - name: Run app in background
+        run: |
+          nohup java -jar target/*.jar > app.log 2>&1 &
+          sleep 30
+
+      - name: Fetch OpenAPI JSON
+        run: curl http://localhost:8080/v3/api-docs -o openapi.json
+
+      - name: Upload openapi.json
+        uses: actions/upload-artifact@v3
+        with:
+          name: openapi-spec
+          path: openapi.json
+
+      - name: Clone swagger repo
+        run: git clone https://github.com/Global-lanz/documentation.github.io.git swagger-docs
+
+      - name: Copy OpenAPI to docs repo
+        run: |
+          cp openapi.json swagger-docs/openapi/${{ env.IMAGE_NAME }}.json
+          cd swagger-docs
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Update OpenAPI spec [skip ci]" || echo "No changes"
+          git push https://x-access-token:${{ secrets.DOCS_REPO_TOKEN }}@github.com/Global-lanz/documentation.github.io.git HEAD:main
