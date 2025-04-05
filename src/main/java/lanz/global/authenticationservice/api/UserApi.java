@@ -7,6 +7,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
+import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.api.request.usergroup.LinkUserAccountToUserGroupsRequest;
@@ -112,6 +113,17 @@ public class UserApi {
                                                               @Valid
                                                               @RequestBody LinkUserAccountToUserGroupsRequest request) {
         userGroupService.unlinkUserAccountToUserGroups(userId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/user/activation")
+    @Operation(summary = "Activate user account", description = "The endpoint activates the user account")
+    @ApiResponse(responseCode = "200", description = "User account has been activated")
+    public ResponseEntity<Void> activateUserAccount(@Schema(description = "The request body")
+                                                    @Valid
+                                                    @RequestBody
+                                                    ActivationRequest verificationToken) {
+        userService.activateUserAccount(verificationToken);
         return ResponseEntity.noContent().build();
     }
 }

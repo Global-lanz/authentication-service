@@ -18,11 +18,11 @@ public class MessageService {
         return LocaleContextHolder.getLocale();
     }
 
-    public String getMessage(String description) {
-        return getMessage(description, getLocale());
+    public String getMessage(String message) {
+        return getMessage(message, getLocale());
     }
 
-    public String getMessage(String description, Locale locale) {
-        return messageSource.getMessage(description, null, locale);
+    public String getMessage(String message, Locale locale) {
+        return messageSource.getMessage(message, null, locale);
     }
 }

@@ -8,11 +8,13 @@ import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.model.UserAccount;
 import lanz.global.authenticationservice.model.UserGroup;
+import lanz.global.authenticationservice.util.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -45,6 +47,9 @@ public class UserServiceTest {
 
     @Mock
     PasswordEncoder passwordEncoderMock;
+
+    @Mock
+    MessageService messageServiceMock;
 
     @Mock
     NotificationService notificationServiceMock;
@@ -89,10 +94,10 @@ public class UserServiceTest {
         when(ruleRepositoryMock.findAll()).thenReturn(List.of());
         when(userGroupRepositoryMock.save(any(UserGroup.class))).thenReturn(new UserGroup());
         when(passwordEncoderMock.encode(anyString())).thenReturn("");
-
+        when(messageServiceMock.getMessage(anyString())).thenReturn("Subject");
         classUnderTest.register(request);
 
         verify(userRepositoryMock).save(any());
-        verify(notificationServiceMock).sendNewUserEmail("Name", "Email");
+        verify(notificationServiceMock).sendNewUserEmail(anyString(), anyString(), anyString(), anyString());
     }
 }
