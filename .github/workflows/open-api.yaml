@@ -29,10 +29,10 @@ jobs:
       - name: Build application
         run: ./mvnw clean package -DskipTests
 
-      - name: Run app in background (on port 8081)
+      - name: Run app in background (with no database connection)
         run: |
-          java -jar target/*.jar > app.log 2>&1 &  # Rodando no background sem nohup
-          sleep 60  # Espera de 60 segundos para garantir que o servidor tenha tempo de inicializar
+          java -Dspring.profiles.active=ci -Dserver.port=8080 -jar target/*.jar > app.log 2>&1 &
+          sleep 60
 
       - name: Check if app is up and running
         run: |
