@@ -76,7 +76,11 @@ public class UserService implements UserDetailsService {
 
         userAccount.setUserGroups(createInitialUserGroups(userAccount));
 
-        return userRepository.save(userAccount).getUserAccountId();
+        UserAccount saveduser = userRepository.save(userAccount);
+
+        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail());
+
+        return saveduser.getUserAccountId();
     }
 
     public String login(LoginRequest request) throws AuthenticationException {
@@ -109,7 +113,7 @@ public class UserService implements UserDetailsService {
         userAccount.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(userAccount);
-        notificationService.sendNotification("The invite has been sent to %s.", userAccount.getName());
+        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail());
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
