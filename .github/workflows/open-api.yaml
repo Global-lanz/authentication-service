@@ -31,8 +31,8 @@ jobs:
 
       - name: Run app in background
         run: |
-          nohup java -jar target/*.jar --server.port=8080 > app.log 2>&1 &
-          sleep 60  # Aumenta o tempo de espera para 60 segundos
+          nohup java -Dserver.port=8080 -jar target/*.jar > app.log 2>&1 &
+          sleep 60  # Aumenta o tempo de espera
 
       - name: Fetch OpenAPI JSON
         run: curl http://localhost:8080/v3/api-docs -o openapi.json
