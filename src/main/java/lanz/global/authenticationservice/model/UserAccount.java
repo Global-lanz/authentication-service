@@ -89,6 +89,17 @@ public class UserAccount implements UserDetails {
         setPassword(encryptedPassword);
         setCompanyId(companyId);
         setCreatedAt(LocalDateTime.now());
+        setLockoutTime(LocalDateTime.of(2175, 1, 1, 0, 0));
+        setVerificationToken(UUID.randomUUID().toString());
+    }
+
+    public UserAccount(String name, String email, UUID companyId) {
+        setName(name);
+        setEmail(email);
+        setCompanyId(companyId);
+        setCreatedAt(LocalDateTime.now());
+        setLockoutTime(LocalDateTime.of(2175, 1, 1, 0, 0));
+        setVerificationToken(UUID.randomUUID().toString());
     }
 
     @Override

@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<UserAccount, UUID> {
     List<UserAccount> findAllByCompanyId(UUID companyId);
 
     Optional<UserAccount> findByUserAccountIdAndCompanyId(UUID userId, UUID companyId);
+
+    Optional<UserAccount> findByVerificationToken(String verificationToken);
 }

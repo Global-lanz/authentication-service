@@ -1,11 +1,13 @@
 package lanz.global.authenticationservice.service;
 
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
+import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.exception.NotFoundException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
+import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;
 import lanz.global.authenticationservice.model.Rule;
 import lanz.global.authenticationservice.model.UserAccount;
 import lanz.global.authenticationservice.model.UserGroup;
@@ -13,10 +15,10 @@ import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.security.TokenService;
+import lanz.global.authenticationservice.util.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,7 +48,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final CompanyService companyService;
     private final NotificationService notificationService;
-    private final MessageSource messageSource;
+    private final MessageService messageService;
 
     private final UserRepository userRepository;
     private final RuleRepository ruleRepository;
@@ -54,7 +56,8 @@ public class UserService implements UserDetailsService {
 
     private AuthenticationManager authenticationManager;
 
-    private final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$");
+    private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$");
+    private static final String ACTIVATE_USER_URL = "http://localhost:8080/authentication/user/activation/%s";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -78,7 +81,7 @@ public class UserService implements UserDetailsService {
 
         UserAccount saveduser = userRepository.save(userAccount);
 
-        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail());
+        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail(), String.format(ACTIVATE_USER_URL, saveduser.getVerificationToken()), messageService.getMessage("email.activate.button"));
 
         return saveduser.getUserAccountId();
     }
@@ -106,14 +109,34 @@ public class UserService implements UserDetailsService {
         validateInviteUser(request);
 
         UUID companyId = getCompanyFromAuthenticatedUser();
-        UserAccount userAccount = new UserAccount();
-        userAccount.setName(request.name());
-        userAccount.setEmail(request.email());
-        userAccount.setCompanyId(companyId);
-        userAccount.setCreatedAt(LocalDateTime.now());
+        CompanyResponse company = companyService.getCompany(companyId);
+
+        UserAccount userAccount = new UserAccount(request.name(), request.email(), companyId);
 
         userRepository.save(userAccount);
-        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail());
+        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail(), company.name(), String.format(ACTIVATE_USER_URL, userAccount.getVerificationToken()), messageService.getMessage("email.activate.button"));
+    }
+
+    public UUID getCompanyFromAuthenticatedUser() {
+        return getUserAccount().getCompanyId();
+    }
+
+    public UserAccount findUserAccountById(UUID userId) {
+        return userRepository.findByUserAccountIdAndCompanyId(userId, getCompanyFromAuthenticatedUser()).orElseThrow(() -> new NotFoundException("User Account"));
+    }
+
+    public void update(UserAccount userAccount) {
+        userRepository.save(userAccount);
+    }
+
+    public void activateUserAccount(ActivationRequest activationRequest) {
+        UserAccount userAccount = userRepository.findByVerificationToken(activationRequest.activationToken()).orElseThrow(() -> new NotFoundException("User Account"));
+        validatePassword(activationRequest.password(), activationRequest.confirmPassword());
+
+        userAccount.setVerificationToken(null);
+        userAccount.setLockoutTime(null);
+        userAccount.setPassword(encrypt(activationRequest.password()));
+        userRepository.save(userAccount);
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
@@ -158,10 +181,14 @@ public class UserService implements UserDetailsService {
     }
 
     private void validatePassword(RegistrationRequest request) throws BadRequestException {
-        if (!request.password().equals(request.confirmPassword()))
+        validatePassword(request.password(), request.confirmPassword());
+    }
+
+    private void validatePassword(String password, String confirmPassword) throws BadRequestException {
+        if (!password.equals(confirmPassword))
             throw new BadRequestException("exception.password.does-not-match.title", "exception.password.does-not-match.message");
 
-        if (!PASSWORD_REGEX.matcher(request.password()).matches())
+        if (!PASSWORD_REGEX.matcher(password).matches())
             throw new BadRequestException("exception.password.pattern-does-not-match.title", "exception.password.pattern-does-not-match.message");
     }
 
@@ -169,15 +196,4 @@ public class UserService implements UserDetailsService {
         validateUserAlreadyExists(request.email());
     }
 
-    public UUID getCompanyFromAuthenticatedUser() {
-        return getUserAccount().getCompanyId();
-    }
-
-    public UserAccount findUserAccountById(UUID userId) {
-        return userRepository.findByUserAccountIdAndCompanyId(userId, getCompanyFromAuthenticatedUser()).orElseThrow(() -> new NotFoundException("User Account"));
-    }
-
-    public void update(UserAccount userAccount) {
-        userRepository.save(userAccount);
-    }
 }

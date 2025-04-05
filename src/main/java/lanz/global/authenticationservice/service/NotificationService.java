@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lanz.global.authenticationservice.external.event.EmailEvent;
 import lanz.global.authenticationservice.external.event.EmailTypeEnum;
 import lanz.global.authenticationservice.external.event.Event;
+import lanz.global.authenticationservice.util.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Map;
 
 @Log4j2
@@ -22,21 +25,35 @@ public class NotificationService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final MessageService messageService;
 
-    public void sendNewUserEmail(String name, String email) {
-        sendEmailNotification(email, Map.of("name", name), EmailTypeEnum.NEW_USER_REGISTERED);
+    public void sendNewUserEmail(String name, String email, String link, String linkLabel) {
+        String subject = messageService.getMessage("email.new-user.subject");
+        Map<String, Object> data = Map.of("name", name,
+                "subject", subject,
+                "link", link,
+                "linkLabel", linkLabel);
+        sendEmailNotification(email, subject, data, EmailTypeEnum.NEW_USER_REGISTERED);
     }
 
-    public void sendInviteUserEmail(String name, String email) {
-        sendEmailNotification(email, Map.of("name", name), EmailTypeEnum.INVITED_USER_REGISTERED);
+    public void sendInviteUserEmail(String name, String email, String company, String link, String linkLabel) {
+        String subject = messageService.getMessage("email.new-user.subject");
+        Map<String, Object> data = Map.of("name", name,
+                "company", company,
+                "subject", subject,
+                "link", link,
+                "linkLabel", linkLabel);
+
+        sendEmailNotification(email, subject, data, EmailTypeEnum.INVITED_USER_REGISTERED);
     }
 
-    public void sendEmailNotification(String email, Map<String, Object> data, EmailTypeEnum emailType) {
+    public void sendEmailNotification(String email, String subject, Map<String, Object> data, EmailTypeEnum emailType) {
         EmailEvent emailEvent = new EmailEvent();
         emailEvent.email = email;
         emailEvent.emailType = emailType;
         emailEvent.data = data;
-        emailEvent.subject = "Welcome!";
+        emailEvent.subject = subject;
+        emailEvent.locale = getLocale().toLanguageTag();
         sendMessage(emailEvent);
     }
 
@@ -48,6 +65,10 @@ public class NotificationService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Locale getLocale() {
+        return LocaleContextHolder.getLocale();
     }
 
 }

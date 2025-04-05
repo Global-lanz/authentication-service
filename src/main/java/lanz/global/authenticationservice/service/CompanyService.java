@@ -33,4 +33,13 @@ public class CompanyService {
         };
     }
 
+    public CompanyResponse getCompany(UUID companyId) {
+        ResponseEntity<CompanyResponse> response = restTemplate.getForEntity(URL + String.format("/%s", companyId.toString()), CompanyResponse.class);
+
+        return switch (response.getStatusCode()) {
+            case HttpStatus.OK -> response.getBody();
+            case HttpStatus.BAD_REQUEST -> throw new BadRequestException("exception.bad-request.title", "exception.bad-request.message", "Company");
+            case null, default -> throw new InternalServerErrorException();
+        };
+    }
 }
