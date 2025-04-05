@@ -9,6 +9,7 @@ on:
 
 jobs:
   generate-openapi:
+    permissions: write-all
     runs-on: ubuntu-latest
 
     env:
