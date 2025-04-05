@@ -27,6 +27,10 @@ public class NotificationService {
         sendEmailNotification(email, Map.of("name", name), EmailTypeEnum.NEW_USER_REGISTERED);
     }
 
+    public void sendInviteUserEmail(String name, String email) {
+        sendEmailNotification(email, Map.of("name", name), EmailTypeEnum.INVITED_USER_REGISTERED);
+    }
+
     public void sendEmailNotification(String email, Map<String, Object> data, EmailTypeEnum emailType) {
         EmailEvent emailEvent = new EmailEvent();
         emailEvent.email = email;

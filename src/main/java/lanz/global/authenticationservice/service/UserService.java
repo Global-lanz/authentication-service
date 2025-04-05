@@ -113,7 +113,7 @@ public class UserService implements UserDetailsService {
         userAccount.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(userAccount);
-        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail());
+        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail());
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
