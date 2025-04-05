@@ -40,11 +40,12 @@ jobs:
           netstat -an | grep 8081  # Verifique se a aplicação está ouvindo na porta 8081
 
       - name: Fetch OpenAPI JSON
-        run: curl -v http://localhost:8080/v3/api-docs -o openapi.json
-        # Adicionando '-v' (verbose) para obter mais detalhes da falha caso haja erro
+        run: |
+          curl -v http://localhost:8080/v3/api-docs -o openapi.json
+          if [ ! -f openapi.json ]; then echo "Failed to fetch OpenAPI spec"; exit 1; fi
 
-      - name: Upload openapi.json
-        uses: actions/upload-artifact@v3.1.2
+      - name: Upload openapi.json if available
+        uses: actions/upload-artifact@v3
         with:
           name: openapi-spec
           path: openapi.json
@@ -57,4 +58,7 @@ jobs:
           cp openapi.json swagger-docs/openapi/${{ env.IMAGE_NAME }}.json
           cd swagger-docs
           git config user.name "github-actions"
-          git config user
+          git config user.email "github-actions@github.com"
+          git add . 
+          git commit -m "Update OpenAPI spec [skip ci]" || echo "No changes"
+          git push https://x-access-token:${{ secrets.DOCS_REPO_TOKEN }}@github.com/Global-lanz/documentation.github.io.git HEAD:main
