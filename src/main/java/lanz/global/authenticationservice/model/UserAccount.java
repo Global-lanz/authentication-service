@@ -89,7 +89,7 @@ public class UserAccount implements UserDetails {
         setPassword(encryptedPassword);
         setCompanyId(companyId);
         setCreatedAt(LocalDateTime.now());
-        setLockoutTime(LocalDateTime.of(2175, 1, 1, 0, 0));
+        setLockoutTime(LocalDateTime.now());
         setVerificationToken(UUID.randomUUID().toString());
     }
 
@@ -98,7 +98,7 @@ public class UserAccount implements UserDetails {
         setEmail(email);
         setCompanyId(companyId);
         setCreatedAt(LocalDateTime.now());
-        setLockoutTime(LocalDateTime.of(2175, 1, 1, 0, 0));
+        setLockoutTime(LocalDateTime.now());
         setVerificationToken(UUID.randomUUID().toString());
     }
 
