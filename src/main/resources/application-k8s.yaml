@@ -11,9 +11,6 @@ spring:
   messages:
     basename: lang/messages
   cloud:
-    config:
-      discovery:
-        enabled: false
     kubernetes:
       discovery:
         enabled: true
