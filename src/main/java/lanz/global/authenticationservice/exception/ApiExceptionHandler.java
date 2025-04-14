@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,6 +56,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccountExpiredException(HttpServletRequest req, AccountExpiredException ex) {
         String title = messageSource.getMessage("exception.account-expired.title", null, getLocale(req));
         String message = messageSource.getMessage("exception.account-expired.message", null, getLocale(req));
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorDTO(title, message));
+    }
+
+    @ExceptionHandler(LockedException.class)
+    public ResponseEntity<ErrorResponse> handleLockedException(HttpServletRequest req, LockedException ex) {
+        String title = messageSource.getMessage("exception.account-locked.title", null, getLocale(req));
+        String message = messageSource.getMessage("exception.account-locked.message", null, getLocale(req));
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorDTO(title, message));
     }
