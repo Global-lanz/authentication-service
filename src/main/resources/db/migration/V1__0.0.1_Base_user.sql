@@ -57,7 +57,7 @@ INSERT INTO rule (name, description) VALUES ('INVITE_USER', 'rule.invite-user.de
 INSERT INTO rule (name, description) VALUES ('LIST_COMPANY_USERS', 'rule.list-company-users.description');
 INSERT INTO rule (name, description) VALUES ('CREATE_CUSTOMER', 'rule.create-customer.description');
 INSERT INTO rule (name, description) VALUES ('LIST_CUSTOMERS', 'rule.list-customers.description');
-INSERT INTO rule (name, description) VALUES ('GET_CUSTOMER_DETAILS', 'rule.get-customer-details.description');
+INSERT INTO rule (name, description) VALUES ('GET_CUSTOMER', 'rule.get-customer.description');
 INSERT INTO rule (name, description) VALUES ('UPDATE_CUSTOMER', 'rule.update-customer.description');
 INSERT INTO rule (name, description) VALUES ('DELETE_CUSTOMER', 'rule.delete-customer.description');
 
