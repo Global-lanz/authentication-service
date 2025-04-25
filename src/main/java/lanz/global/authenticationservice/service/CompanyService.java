@@ -1,7 +1,7 @@
 package lanz.global.authenticationservice.service;
 
 import jakarta.ws.rs.InternalServerErrorException;
-import lanz.global.authenticationservice.clients.CompanyClient;
+import lanz.global.authenticationservice.external.api.company.CompanyClient;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.external.api.company.request.CreateCompanyRequest;
 import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;

@@ -1,4 +1,4 @@
-package lanz.global.authenticationservice.clients;
+package lanz.global.authenticationservice.external.api.company;
 
 import lanz.global.authenticationservice.external.api.company.request.CreateCompanyRequest;
 import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;
