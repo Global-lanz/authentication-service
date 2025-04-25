@@ -3,7 +3,6 @@ package lanz.global.authenticationservice.external.api.company;
 import lanz.global.authenticationservice.external.api.company.request.CreateCompanyRequest;
 import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +14,9 @@ import java.util.UUID;
 public interface CompanyClient {
 
     @PostMapping("/company")
-    ResponseEntity<CompanyResponse> createCompany(@RequestBody CreateCompanyRequest request);
+    CompanyResponse createCompany(@RequestBody CreateCompanyRequest request);
 
     @GetMapping("/company/{companyId}")
-    ResponseEntity<CompanyResponse> findCompanyById(@PathVariable UUID companyId);
+    CompanyResponse findCompanyById(@PathVariable UUID companyId);
 
 }

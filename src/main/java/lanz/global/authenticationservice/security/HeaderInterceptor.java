@@ -30,6 +30,8 @@ public class HeaderInterceptor implements RequestInterceptor {
         put(HttpHeaders.AUTHORIZATION, authorization, headers);
         put(HttpHeaders.ACCEPT, accept, headers);
         put(HttpHeaders.ACCEPT_LANGUAGE, language, headers);
+
+        requestTemplate.headers(headers);
     }
 
     private void put(String key, String value, Map<String, Collection<String>> headers) {

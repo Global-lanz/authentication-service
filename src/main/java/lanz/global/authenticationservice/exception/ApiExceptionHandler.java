@@ -1,5 +1,6 @@
 package lanz.global.authenticationservice.exception;
 
+import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import lanz.global.authenticationservice.exception.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.Locale;
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final MessageSource messageSource;
+    private final FeignErrorDecoder feignErrorDecoder;
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleError(HttpServletRequest req, Exception ex) {
@@ -74,6 +76,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         String message = messageSource.getMessage("exception.authorization-denied-exception.message", null, getLocale(req));
         log.error(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(createErrorDTO(title, message));
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ErrorResponse> handleFeignException(HttpServletRequest req, FeignException ex) {
+        return ResponseEntity.status(ex.status()).body(feignErrorDecoder.decode(ex));
     }
 
 
