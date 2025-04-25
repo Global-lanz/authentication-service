@@ -1,40 +1,42 @@
 package lanz.global.authenticationservice.security;
 
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.HttpHeaders;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Component
-public class HeaderInterceptor implements ClientHttpRequestInterceptor {
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+public class HeaderInterceptor implements RequestInterceptor {
 
-    @Autowired
-    HttpServletRequest request;
+    private final HttpServletRequest request;
 
     @Override
-    public ClientHttpResponse intercept(
-            HttpRequest httpRequest,
-            byte[] body,
-            ClientHttpRequestExecution execution) throws IOException {
+    public void apply(RequestTemplate requestTemplate) {
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String accept = request.getHeader(HttpHeaders.ACCEPT);
+        String language = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
 
 
-        String authorization = request.getHeader("Authorization");
-        String accept = request.getHeader("Accept");
-        String language = request.getHeader("accept-language");
+        Map<String, Collection<String>> headers = requestTemplate.headers();
 
+        put(HttpHeaders.AUTHORIZATION, authorization, headers);
+        put(HttpHeaders.ACCEPT, accept, headers);
+        put(HttpHeaders.ACCEPT_LANGUAGE, language, headers);
 
-        HttpHeaders headers = httpRequest.getHeaders();
-        headers.add("Authorization", authorization);
-        headers.add("Accept", accept);
-        headers.add("accept-language", language);
-
-        return execution.execute(httpRequest, body);
+        requestTemplate.headers(headers);
     }
 
+    private void put(String key, String value, Map<String, Collection<String>> headers) {
+        if (key != null && value != null) {
+            headers.put(key, List.of(value));
+        }
+    }
 }
