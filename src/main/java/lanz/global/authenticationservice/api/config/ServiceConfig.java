@@ -5,15 +5,15 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
-@ConfigurationProperties("authentication")
-public class AuthenticationServiceConfig {
+@ConfigurationProperties("gl.service.config")
+public class ServiceConfig {
 
     private final Security security = new Security();
 
     @Getter
     @Setter
     public static class Security {
-        private Boolean enableHttps;
+        private String apiSecret;
         private String originAllowed;
         private String basicUser;
         private String basicPassword;
