@@ -24,19 +24,14 @@ public class HeaderInterceptor implements RequestInterceptor {
         String accept = request.getHeader(HttpHeaders.ACCEPT);
         String language = request.getHeader(HttpHeaders.ACCEPT_LANGUAGE);
 
-
-        Map<String, Collection<String>> headers = requestTemplate.headers();
-
-        put(HttpHeaders.AUTHORIZATION, authorization, headers);
-        put(HttpHeaders.ACCEPT, accept, headers);
-        put(HttpHeaders.ACCEPT_LANGUAGE, language, headers);
-
-        requestTemplate.headers(headers);
+        put(HttpHeaders.AUTHORIZATION, authorization, requestTemplate);
+        put(HttpHeaders.ACCEPT, accept, requestTemplate);
+        put(HttpHeaders.ACCEPT_LANGUAGE, language, requestTemplate);
     }
 
-    private void put(String key, String value, Map<String, Collection<String>> headers) {
+    private void put(String key, String value, RequestTemplate requestTemplate) {
         if (key != null && value != null) {
-            headers.put(key, List.of(value));
+            requestTemplate.header(key, List.of(value));
         }
     }
 }
