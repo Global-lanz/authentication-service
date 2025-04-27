@@ -3,19 +3,18 @@ package lanz.global.authenticationservice.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import lanz.global.authenticationservice.api.config.ServiceConfig;
 import lanz.global.authenticationservice.model.Rule;
 import lanz.global.authenticationservice.model.UserAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -23,11 +22,11 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TokenService {
 
-    private final String secret = "3m1nh4Ch4v3Sup3rC0mpL3x4!!123456";
+    private final ServiceConfig config;
 
     public String validateToken(String token) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(config.getSecurity().getApiSecret());
 
             return JWT.require(algorithm)
                     .withIssuer("auth")
@@ -41,7 +40,7 @@ public class TokenService {
 
     public String generateToken(UserAccount userAccount) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
+            Algorithm algorithm = Algorithm.HMAC256(config.getSecurity().getApiSecret());
 
             Rule userRule = new Rule();
             userRule.setName("USER");

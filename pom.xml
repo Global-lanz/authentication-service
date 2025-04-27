@@ -10,7 +10,7 @@
     </parent>
     <groupId>lanz.global</groupId>
     <artifactId>authentication-service</artifactId>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <name>authentication-service</name>
     <description>authentication-service</description>
     <url/>
