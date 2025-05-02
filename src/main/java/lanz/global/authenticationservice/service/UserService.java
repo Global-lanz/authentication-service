@@ -5,6 +5,7 @@ import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
+import lanz.global.authenticationservice.exception.ExpiredTokenException;
 import lanz.global.authenticationservice.exception.NotFoundException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
 import lanz.global.authenticationservice.external.api.company.response.CompanyResponse;
@@ -17,6 +18,7 @@ import lanz.global.authenticationservice.repository.UserRepository;
 import lanz.global.authenticationservice.security.TokenService;
 import lanz.global.authenticationservice.util.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -130,17 +132,25 @@ public class UserService implements UserDetailsService {
     }
 
     public void activateUserAccount(ActivationRequest activationRequest) {
-        UserAccount userAccount = userRepository.findByVerificationToken(activationRequest.activationToken()).orElseThrow(() -> new NotFoundException("User Account"));
-        validatePassword(activationRequest.password(), activationRequest.confirmPassword());
+        UserAccount userAccount = userRepository.findByVerificationToken(activationRequest.activationToken()).orElseThrow(() -> new ExpiredTokenException());
+
+        validateActivateUserAccount(activationRequest);
 
         userAccount.setVerificationToken(null);
         userAccount.setLockoutTime(null);
-        userAccount.setPassword(encrypt(activationRequest.password()));
+        if (StringUtils.isNotBlank(activationRequest.password())) {
+            userAccount.setPassword(encrypt(activationRequest.password()));
+        }
         userRepository.save(userAccount);
     }
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
         return userRepository.findAllByCompanyId(getCompanyFromAuthenticatedUser());
+    }
+
+    private void validateActivateUserAccount(ActivationRequest activationRequest) {
+        if (StringUtils.isNotBlank(activationRequest.password()))
+            validatePassword(activationRequest.password(), activationRequest.confirmPassword());
     }
 
     private List<UserGroup> createInitialUserGroups(UserAccount userAccount) {
