@@ -2,8 +2,13 @@ package lanz.global.authenticationservice.exception;
 
 import lombok.Getter;
 
+import java.io.Serial;
+
 @Getter
 public class ServiceException extends RuntimeException {
+
+    @Serial
+    private static final long serialVersionUID = 7926009157034245038L;
 
     private final String title;
     private final String message;
