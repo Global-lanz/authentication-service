@@ -1,8 +1,11 @@
 package lanz.global.authenticationservice.service;
 
+import lanz.global.authenticationservice.api.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
+import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActivationRequest;
+import lanz.global.authenticationservice.api.request.user.PasswordRecoveryRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.exception.ExpiredTokenException;
@@ -35,6 +38,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -58,17 +63,15 @@ public class UserService implements UserDetailsService {
 
     private AuthenticationManager authenticationManager;
 
+    private final ServiceConfig config;
+
     private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$");
-    private static final String ACTIVATE_USER_URL = "http://localhost:8080/authentication/user/activation/%s";
+    private static final String ACTIVATE_USER_URL = "%s/user/activation/%s";
+    private static final String PASSWORD_RECOVERY_URL = "%s/user/password/%s";
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserAccount> user = userRepository.findByEmail(username);
-
-        if (user.isEmpty())
-            throw new UsernameNotFoundException("User not found");
-
-        return user.get();
+        return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Transactional
@@ -83,7 +86,9 @@ public class UserService implements UserDetailsService {
 
         UserAccount saveduser = userRepository.save(userAccount);
 
-        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail(), String.format(ACTIVATE_USER_URL, saveduser.getVerificationToken()), messageService.getMessage("email.activate.button"));
+        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), saveduser.getVerificationToken());
+
+        notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail(), frontendUrl, messageService.getMessage("email.activate.button"));
 
         return saveduser.getUserAccountId();
     }
@@ -114,9 +119,11 @@ public class UserService implements UserDetailsService {
         CompanyResponse company = companyService.getCompany(companyId);
 
         UserAccount userAccount = new UserAccount(request.name(), request.email(), companyId);
-
         userRepository.save(userAccount);
-        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail(), company.name(), String.format(ACTIVATE_USER_URL, userAccount.getVerificationToken()), messageService.getMessage("email.activate.button"));
+
+        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), userAccount.getVerificationToken());
+
+        notificationService.sendInviteUserEmail(userAccount.getName(), userAccount.getEmail(), company.name(), frontendUrl, messageService.getMessage("email.activate.button"));
     }
 
     public UUID getCompanyFromAuthenticatedUser() {
@@ -124,7 +131,7 @@ public class UserService implements UserDetailsService {
     }
 
     public UserAccount findUserAccountById(UUID userId) {
-        return userRepository.findByUserAccountIdAndCompanyId(userId, getCompanyFromAuthenticatedUser()).orElseThrow(() -> new NotFoundException("User Account"));
+        return userRepository.findByUserAccountIdAndCompanyId(userId, getCompanyFromAuthenticatedUser()).orElseThrow(() -> new NotFoundException("user account"));
     }
 
     public void update(UserAccount userAccount) {
@@ -132,7 +139,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void activateUserAccount(ActivationRequest activationRequest) {
-        UserAccount userAccount = userRepository.findByVerificationToken(activationRequest.activationToken()).orElseThrow(() -> new ExpiredTokenException());
+        UserAccount userAccount = userRepository.findByVerificationToken(activationRequest.activationToken()).orElseThrow(ExpiredTokenException::new);
 
         validateActivateUserAccount(activationRequest);
 
@@ -146,6 +153,42 @@ public class UserService implements UserDetailsService {
 
     public List<UserAccount> getUserAccountsFromCurrentCompany() {
         return userRepository.findAllByCompanyId(getCompanyFromAuthenticatedUser());
+    }
+
+    public void passwordRecoveryRequest(PasswordRecoveryRequest request) {
+        Optional<UserAccount> userAccountOptional = userRepository.findByEmail(request.email());
+
+        if (userAccountOptional.isPresent()) {
+            UserAccount userAccount = userAccountOptional.get();
+            Integer expires = config.getSecurity().getPasswordRecovery().getExpires();
+            TemporalUnit unit = ChronoUnit.valueOf(config.getSecurity().getPasswordRecovery().getUnit());
+
+            userAccount.setResetPasswordExpires(LocalDateTime.now().plus(expires, unit));
+            userAccount.setResetPasswordToken(UUID.randomUUID().toString());
+
+            userRepository.save(userAccount);
+
+            String frontendUrl = String.format(PASSWORD_RECOVERY_URL, config.getFrontendUrl(), userAccount.getResetPasswordToken());
+
+            notificationService.sendPasswordRecoveryRequest(
+                    userAccount.getName(),
+                    userAccount.getEmail(),
+                    userAccount.getResetPasswordToken(),
+                    frontendUrl,
+                    messageService.getMessage("email.password-recovery-request.button"));
+        }
+    }
+
+    public void passwordRecoveryActivation(PasswordRecoveryActivationRequest request) {
+        UserAccount userAccount = userRepository.findByResetPasswordToken(request.resetPasswordToken()).orElseThrow(() -> new NotFoundException("user account"));
+        validatePassword(request.password(), request.confirmPassword());
+
+        userAccount.setPassword(encrypt(request.password()));
+        userAccount.setResetPasswordToken(null);
+        userAccount.setResetPasswordExpires(null);
+        userAccount.setLockoutTime(null);
+
+        userRepository.save(userAccount);
     }
 
     private void validateActivateUserAccount(ActivationRequest activationRequest) {
@@ -205,5 +248,4 @@ public class UserService implements UserDetailsService {
     private void validateInviteUser(InviteRequest request) {
         validateUserAlreadyExists(request.email());
     }
-
 }
