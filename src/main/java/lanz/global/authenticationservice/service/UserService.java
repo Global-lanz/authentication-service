@@ -177,7 +177,6 @@ public class UserService implements UserDetailsService {
                     frontendUrl,
                     messageService.getMessage("email.password-recovery-request.button"));
         }
-
     }
 
     public void passwordRecoveryActivation(PasswordRecoveryActivationRequest request) {
@@ -187,6 +186,7 @@ public class UserService implements UserDetailsService {
         userAccount.setPassword(encrypt(request.password()));
         userAccount.setResetPasswordToken(null);
         userAccount.setResetPasswordExpires(null);
+        userAccount.setLockoutTime(null);
 
         userRepository.save(userAccount);
     }
