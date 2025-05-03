@@ -52,5 +52,5 @@ gl:
         api-secret: abc123
         password-recovery:
           expires: 7
-          unit: DAY
+          unit: DAYS
       frontend-url: "http://localhost:4200/"
