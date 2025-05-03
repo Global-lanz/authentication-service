@@ -1,20 +1,20 @@
 package lanz.global.authenticationservice.service;
 
+import lanz.global.authenticationservice.api.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
+import lanz.global.authenticationservice.model.UserAccount;
+import lanz.global.authenticationservice.model.UserGroup;
 import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
-import lanz.global.authenticationservice.model.UserAccount;
-import lanz.global.authenticationservice.model.UserGroup;
 import lanz.global.authenticationservice.util.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-public class UserServiceTest {
+class UserServiceTest {
 
     @InjectMocks
     UserService classUnderTest;
@@ -54,9 +54,14 @@ public class UserServiceTest {
     @Mock
     NotificationService notificationServiceMock;
 
+    @Mock
+    ServiceConfig configMock;
+
     @BeforeEach
     void setUp() {
         openMocks(this);
+
+        when(configMock.getFrontendUrl()).thenReturn("frontend.url//");
     }
 
     @Test

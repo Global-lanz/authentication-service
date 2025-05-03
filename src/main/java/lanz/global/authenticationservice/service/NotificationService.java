@@ -57,6 +57,17 @@ public class NotificationService {
         sendMessage(emailEvent);
     }
 
+    public void sendPasswordRecoveryRequest(String name, String email, String resetPasswordToken, String link, String linkLabel) {
+        String subject = messageService.getMessage("email.password-recovery-request.subject");
+        Map<String, Object> data = Map.of("name", name,
+                "subject", subject,
+                "resetPasswordToken", resetPasswordToken,
+                "link", link,
+                "linkLabel", linkLabel);
+
+        sendEmailNotification(email, subject, data, EmailTypeEnum.PASSWORD_RECOVERY);
+    }
+
     private void sendMessage(Event event) {
         try {
             String message = objectMapper.writeValueAsString(event);
@@ -66,7 +77,6 @@ public class NotificationService {
             throw new RuntimeException(e);
         }
     }
-
     private Locale getLocale() {
         return LocaleContextHolder.getLocale();
     }
