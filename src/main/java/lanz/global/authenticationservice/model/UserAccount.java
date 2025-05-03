@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAccount implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = -3700918508771351833L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
