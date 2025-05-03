@@ -9,6 +9,8 @@ import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
+import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActivationRequest;
+import lanz.global.authenticationservice.api.request.user.PasswordRecoveryRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.api.request.usergroup.LinkUserAccountToUserGroupsRequest;
 import lanz.global.authenticationservice.api.response.login.LoginResponse;
@@ -118,12 +120,36 @@ public class UserApi {
 
     @PostMapping("/user/activation")
     @Operation(summary = "Activate user account", description = "The endpoint activates the user account")
-    @ApiResponse(responseCode = "200", description = "User account has been activated")
+    @ApiResponse(responseCode = "204", description = "User account has been activated")
+    @ApiResponse(responseCode = "400", description = "Activation token is invalid or expired")
+    @ApiResponse(responseCode = "400", description = "Passwords doesn't match")
     public ResponseEntity<Void> activateUserAccount(@Schema(description = "The request body")
                                                     @Valid
                                                     @RequestBody
-                                                    ActivationRequest verificationToken) {
-        userService.activateUserAccount(verificationToken);
+                                                    ActivationRequest activationRequest) {
+        userService.activateUserAccount(activationRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/user/password-recovery/request")
+    @Operation(summary = "Password recovery", description = "The endpoint is used to request a password change")
+    @ApiResponse(responseCode = "204", description = "Password recovery has been requested")
+    public ResponseEntity<Void> passwordRecoveryRequest(@Schema(description = "The request body")
+                                                        @Valid
+                                                        @RequestBody
+                                                        PasswordRecoveryRequest request) {
+        userService.passwordRecoveryRequest(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/user/password-recovery/activation")
+    @Operation(summary = "Password recovery activation", description = "The endpoint is used to activate the user account after requesting the password recovery")
+    @ApiResponse(responseCode = "204", description = "Password has been recovered")
+    public ResponseEntity<Void> passwordRecoveryActivation(@Schema(description = "The request body")
+                                                           @Valid
+                                                           @RequestBody
+                                                           PasswordRecoveryActivationRequest request) {
+        userService.passwordRecoveryActivation(request);
         return ResponseEntity.noContent().build();
     }
 }
