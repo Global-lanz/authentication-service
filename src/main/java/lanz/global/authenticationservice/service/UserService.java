@@ -8,6 +8,7 @@ import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActiva
 import lanz.global.authenticationservice.api.request.user.PasswordRecoveryRequest;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
+import lanz.global.authenticationservice.exception.ExpiredResetPasswordTokenException;
 import lanz.global.authenticationservice.exception.ExpiredTokenException;
 import lanz.global.authenticationservice.exception.NotFoundException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;
@@ -180,8 +181,8 @@ public class UserService implements UserDetailsService {
     }
 
     public void passwordRecoveryActivation(PasswordRecoveryActivationRequest request) {
-        UserAccount userAccount = userRepository.findByResetPasswordToken(request.resetPasswordToken()).orElseThrow(() -> new NotFoundException("user account"));
-        validatePassword(request.password(), request.confirmPassword());
+        UserAccount userAccount = userRepository.findByResetPasswordToken(request.resetPasswordToken()).orElseThrow(ExpiredResetPasswordTokenException::new);
+        validatePasswordRecoveryActivation(request, userAccount);
 
         userAccount.setPassword(encrypt(request.password()));
         userAccount.setResetPasswordToken(null);
@@ -189,6 +190,14 @@ public class UserService implements UserDetailsService {
         userAccount.setLockoutTime(null);
 
         userRepository.save(userAccount);
+    }
+
+    private void validatePasswordRecoveryActivation(PasswordRecoveryActivationRequest request, UserAccount userAccount) {
+        if (LocalDateTime.now().isAfter(userAccount.getResetPasswordExpires())) {
+            throw new ExpiredResetPasswordTokenException();
+        }
+
+        validatePassword(request.password(), request.confirmPassword());
     }
 
     private void validateActivateUserAccount(ActivationRequest activationRequest) {
