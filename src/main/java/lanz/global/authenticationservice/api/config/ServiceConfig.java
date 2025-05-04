@@ -18,6 +18,7 @@ public class ServiceConfig {
         private String originAllowed;
         private String basicUser;
         private String basicPassword;
+        private Integer loginAttempts;
 
         private final PasswordRecovery passwordRecovery = new PasswordRecovery();
     }
