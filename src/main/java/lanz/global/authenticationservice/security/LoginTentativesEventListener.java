@@ -17,8 +17,8 @@ public class LoginTentativesEventListener {
     @EventListener
     public void authenticationFailed(AuthenticationFailureBadCredentialsEvent event) {
 
-        if (event.getAuthentication().getPrincipal() instanceof UserAccount userAccount) {
-            userService.validateLoginAttempts(userAccount);
+        if (event.getAuthentication().getPrincipal() instanceof String email) {
+            userService.validateLoginAttempts(email);
         }
 
     }

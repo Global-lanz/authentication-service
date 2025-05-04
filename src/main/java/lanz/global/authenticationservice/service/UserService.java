@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -260,15 +259,24 @@ public class UserService implements UserDetailsService {
         validateUserAlreadyExists(request.email());
     }
 
-    public void validateLoginAttempts(UserAccount userAccount) {
-        if (userAccount.getLoginAttempts() == null) {
-            userAccount.setLoginAttempts(1);
-        } else if (userAccount.getLoginAttempts() <= config.getSecurity().getLoginAttempts()) {
-            userAccount.setLoginAttempts(userAccount.getLoginAttempts() + 1);
-        } else {
-            userAccount.setLockoutTime(LocalDateTime.now());
-        }
+    public void validateLoginAttempts(String email) {
+        Optional<UserAccount> userAccountOptional = findUserAccountByEmail(email);
+        if (userAccountOptional.isPresent()) {
+            UserAccount userAccount = userAccountOptional.get();
 
-        userRepository.save(userAccount);
+            if (userAccount.getLoginAttempts() == null) {
+                userAccount.setLoginAttempts(1);
+            } else if (userAccount.getLoginAttempts() < config.getSecurity().getLoginAttempts()) {
+                userAccount.setLoginAttempts(userAccount.getLoginAttempts() + 1);
+            } else {
+                userAccount.setLockoutTime(LocalDateTime.now());
+            }
+
+            userRepository.save(userAccount);
+        }
+    }
+
+    private Optional<UserAccount> findUserAccountByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
