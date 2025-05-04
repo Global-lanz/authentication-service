@@ -53,4 +53,5 @@ gl:
         password-recovery:
           expires: 7
           unit: DAYS
+        login-attempts: 7
       frontend-url: "http://localhost:4200/"

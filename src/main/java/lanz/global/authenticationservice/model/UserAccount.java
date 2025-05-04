@@ -49,9 +49,6 @@ public class UserAccount implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "password_salt")
-    private String passwordSalt;
-
     @Column(name = "login_attempts")
     private Integer loginAttempts;
 

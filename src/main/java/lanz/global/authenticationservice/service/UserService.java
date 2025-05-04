@@ -85,13 +85,13 @@ public class UserService implements UserDetailsService {
 
         userAccount.setUserGroups(createInitialUserGroups(userAccount));
 
-        UserAccount saveduser = userRepository.save(userAccount);
+        UserAccount savedUser = userRepository.save(userAccount);
 
-        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), saveduser.getVerificationToken());
+        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), savedUser.getVerificationToken());
 
         notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail(), frontendUrl, messageService.getMessage("email.activate.button"));
 
-        return saveduser.getUserAccountId();
+        return savedUser.getUserAccountId();
     }
 
     public String login(LoginRequest request) throws AuthenticationException {
@@ -101,6 +101,7 @@ public class UserService implements UserDetailsService {
 
         if (auth.getPrincipal() instanceof UserAccount userAccount) {
             userAccount.setLastLogin(LocalDateTime.now());
+            userAccount.setLoginAttempts(0);
             userRepository.save(userAccount);
             return tokenService.generateToken(userAccount);
         }
@@ -256,5 +257,26 @@ public class UserService implements UserDetailsService {
 
     private void validateInviteUser(InviteRequest request) {
         validateUserAlreadyExists(request.email());
+    }
+
+    public void validateLoginAttempts(String email) {
+        Optional<UserAccount> userAccountOptional = findUserAccountByEmail(email);
+        if (userAccountOptional.isPresent()) {
+            UserAccount userAccount = userAccountOptional.get();
+
+            if (userAccount.getLoginAttempts() == null) {
+                userAccount.setLoginAttempts(1);
+            } else if (userAccount.getLoginAttempts() < config.getSecurity().getLoginAttempts()) {
+                userAccount.setLoginAttempts(userAccount.getLoginAttempts() + 1);
+            } else {
+                userAccount.setLockoutTime(LocalDateTime.now());
+            }
+
+            userRepository.save(userAccount);
+        }
+    }
+
+    private Optional<UserAccount> findUserAccountByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
