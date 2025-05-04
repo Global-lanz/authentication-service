@@ -85,13 +85,13 @@ public class UserService implements UserDetailsService {
 
         userAccount.setUserGroups(createInitialUserGroups(userAccount));
 
-        UserAccount saveduser = userRepository.save(userAccount);
+        UserAccount savedUser = userRepository.save(userAccount);
 
-        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), saveduser.getVerificationToken());
+        String frontendUrl = String.format(ACTIVATE_USER_URL, config.getFrontendUrl(), savedUser.getVerificationToken());
 
         notificationService.sendNewUserEmail(userAccount.getName(), userAccount.getEmail(), frontendUrl, messageService.getMessage("email.activate.button"));
 
-        return saveduser.getUserAccountId();
+        return savedUser.getUserAccountId();
     }
 
     public String login(LoginRequest request) throws AuthenticationException {
