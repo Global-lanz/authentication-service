@@ -191,14 +191,15 @@
                 <artifactId>native-maven-plugin</artifactId>
                 <version>${native-buildtools.version}</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <fallback>false</fallback>
+                    <verbose>false</verbose>
+                    <buildArgs>
+                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                    </buildArgs>
+                </configuration>
                 <executions>
-                    <execution>
-                        <id>test-native</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <id>build-native</id>
                         <phase>package</phase>
@@ -207,16 +208,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <fallback>false</fallback>
-                    <verbose>true</verbose>
-                    <buildArgs>
-                        <buildArg>--initialize-at-build-time=org.slf4j</buildArg>
-                        <buildArg>--initialize-at-build-time=ch.qos.logback</buildArg>
-                        <buildArg>--allow-incomplete-classpath</buildArg>
-                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
-                    </buildArgs>
-                </configuration>
             </plugin>
         </plugins>
     </build>
