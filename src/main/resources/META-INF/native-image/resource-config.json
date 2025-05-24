@@ -1,0 +1,15 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\Qmockito-extensions/org.mockito.plugins.MockMaker\\E"
+      },
+      {
+        "pattern": "\\Qmockito-extensions/org.mockito.plugins.PluginSwitch\\E"
+      },
+      {
+        "pattern": "\\Qorg/springframework/test/context/support/DefaultTestContextBootstrapper.class\\E"
+      }
+    ]
+  }
+}
