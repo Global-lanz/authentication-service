@@ -120,6 +120,18 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Dependência para testes nativos -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito para testes nativos -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -198,6 +210,12 @@
                 <configuration>
                     <fallback>false</fallback>
                     <verbose>true</verbose>
+                    <buildArgs>
+                        <buildArg>--initialize-at-build-time=org.slf4j</buildArg>
+                        <buildArg>--initialize-at-build-time=ch.qos.logback</buildArg>
+                        <buildArg>--allow-incomplete-classpath</buildArg>
+                        <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                    </buildArgs>
                 </configuration>
             </plugin>
         </plugins>

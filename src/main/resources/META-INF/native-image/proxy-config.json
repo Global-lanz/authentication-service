@@ -1,0 +1,5 @@
+[
+  {
+    "interfaces": ["org.mockito.plugins.PluginSwitch"]
+  }
+]
