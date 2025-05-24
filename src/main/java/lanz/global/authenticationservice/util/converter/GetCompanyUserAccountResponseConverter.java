@@ -3,9 +3,7 @@ package lanz.global.authenticationservice.util.converter;
 import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUserAccountResponse;
 import lanz.global.authenticationservice.api.response.usergroup.UserGroupResponse;
 import lanz.global.authenticationservice.model.UserAccount;
-import lanz.global.authenticationservice.model.UserGroup;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
