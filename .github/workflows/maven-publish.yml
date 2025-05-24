@@ -47,14 +47,18 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
+      - name: Run tests if Native Image enabled
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && contains(github.event.pull_request.labels.*.name, 'native') }}
+        run: mvn test
+
       # ✨ MODIFICADO: Build com opção nativa baseado na label
       - name: Build Native Image with Maven and Deploy into Docker Hub
         if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && contains(github.event.pull_request.labels.*.name, 'native') }}
-        run: mvn spring-boot:build-image -Pnative -X "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}-native" --file pom.xml
+        run: mvn spring-boot:build-image -Pnative -X -DskipTests "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}-native" --file pom.xml
 
       - name: Build Regular Image with Maven and Deploy into Docker Hub
         if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && !contains(github.event.pull_request.labels.*.name, 'native') }}
-        run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
+        run: mvn spring-boot:build-image -DskipTests "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
 
       - name: Build with Maven (no deploy)
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'RC') }}
