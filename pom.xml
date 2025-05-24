@@ -202,38 +202,8 @@
                 <repackage.classifier>exec</repackage.classifier>
                 <native-buildtools.version>0.10.3</native-buildtools.version>
             </properties>
-            <dependencies>
-                <!-- Dependências específicas para suporte nativo -->
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-aot</artifactId>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
-                    <!-- Plugin para processamento AOT (Ahead of Time) -->
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <classifier>${repackage.classifier}</classifier>
-                            <image>
-                                <builder>paketobuildpacks/builder-jammy-base:latest</builder>
-                                <env>
-                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                                </env>
-                            </image>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>process-aot</id>
-                                <goals>
-                                    <goal>process-aot</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    
                     <!-- Plugin GraalVM Native Build Tools -->
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
@@ -249,32 +219,32 @@
                                 <buildArg>--no-fallback</buildArg>
                                 <buildArg>--report-unsupported-elements-at-runtime</buildArg>
                                 <buildArg>--allow-incomplete-classpath</buildArg>
-                                
+
                                 <!-- Otimizações de memória e performance -->
                                 <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
                                 <buildArg>-H:+ReportExceptionStackTraces</buildArg>
                                 <buildArg>-H:+AddAllCharsets</buildArg>
                                 <buildArg>-H:+AllowVMInspection</buildArg>
-                                
+
                                 <!-- Configurações específicas para Spring Boot -->
                                 <buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory</buildArg>
                                 <buildArg>--initialize-at-build-time=ch.qos.logback</buildArg>
                                 <buildArg>--initialize-at-build-time=org.apache.commons.logging.LogFactory</buildArg>
                                 <buildArg>--initialize-at-build-time=org.springframework.util.unit.DataSize</buildArg>
-                                
+
                                 <!-- Suporte para protocolos e recursos -->
                                 <buildArg>--enable-url-protocols=http,https</buildArg>
                                 <buildArg>--enable-all-security-services</buildArg>
-                                
+
                                 <!-- Configurações para JPA/Hibernate -->
                                 <buildArg>--initialize-at-build-time=org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider</buildArg>
-                                
+
                                 <!-- Configurações para Kafka (se necessário) -->
                                 <buildArg>--initialize-at-run-time=org.apache.kafka</buildArg>
-                                
+
                                 <!-- Configurações para JWT -->
                                 <buildArg>--initialize-at-run-time=com.auth0.jwt</buildArg>
-                                
+
                                 <!-- Configurações de memória -->
                                 <buildArg>-J-Xmx8g</buildArg>
                             </buildArgs>
@@ -290,50 +260,17 @@
                                     <goal>add-reachability-metadata</goal>
                                 </goals>
                             </execution>
-                            <execution>
-                                <id>build-native</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>compile-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    
-                    <!-- Plugin para testes nativos -->
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>process-test-aot</id>
-                                <goals>
-                                    <goal>process-test-aot</goal>
-                                </goals>
-                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- Profile para testes nativos separadamente -->
         <profile>
             <id>nativeTest</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>process-test-aot</id>
-                                <goals>
-                                    <goal>process-test-aot</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
