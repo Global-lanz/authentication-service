@@ -21,6 +21,8 @@ spring:
   cloud:
     discovery:
       enabled: true
+    refresh:
+      enabled: false
 
 springdoc:
   api-docs:
