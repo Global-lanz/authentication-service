@@ -1,13 +1,10 @@
 # This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
-
 name: Build and Publish Release
-
 on:
   pull_request:
     types: [opened, synchronize, labeled, unlabeled]
     branches: [ "main" ]
-
 jobs:
   build-and-deploy-rc:
     runs-on: ubuntu-latest
@@ -15,73 +12,92 @@ jobs:
       contents: write        # necessário para criar tags
       pull-requests: write   # necessário para comentar no PR
       packages: write
-
     env:
       IMAGE_NAME: maiconlanzendorf/authentication-service
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - uses: actions/checkout@v4
 
-    #############################################
-    # 🚀 Só gera RC se o PR tiver a label RC
-    #############################################
-    - name: Generate RC Version
-      id: rc_version
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: |
-        DATE=$(date +'%Y%m%d')
+      # ✨ NOVO: Setup GraalVM para build nativo
+      - name: Set up GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm-community'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          cache: maven
 
-        EXISTING_TAGS=$(git ls-remote --tags origin "refs/tags/RC.${DATE}.*" | wc -l)
+      #############################################
+      # 🚀 Só gera RC se o PR tiver a label RC
+      #############################################
+      - name: Generate RC Version
+        id: rc_version
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+        run: |
+          DATE=$(date +'%Y%m%d')
+          EXISTING_TAGS=$(git ls-remote --tags origin "refs/tags/RC.${DATE}.*" | wc -l)
+          COUNT=$(printf "%03d" $((EXISTING_TAGS + 1)))
+          RC_VERSION="RC.${DATE}.${COUNT}"
+          echo "RC Version: $RC_VERSION"
+          echo "rc_version=$RC_VERSION" >> $GITHUB_OUTPUT
 
-        COUNT=$(printf "%03d" $((EXISTING_TAGS + 1)))
+      - name: Login to Docker Hub
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-        RC_VERSION="RC.${DATE}.${COUNT}"
+      # ✨ MODIFICADO: Build com opção nativa baseado na label
+      - name: Build Native Image with Maven and Deploy into Docker Hub
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && contains(github.event.pull_request.labels.*.name, 'native') }}
+        run: mvn spring-boot:build-image -Pnative "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}-native" --file pom.xml
 
-        echo "RC Version: $RC_VERSION"
-        echo "rc_version=$RC_VERSION" >> $GITHUB_OUTPUT
+      - name: Build Regular Image with Maven and Deploy into Docker Hub
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && !contains(github.event.pull_request.labels.*.name, 'native') }}
+        run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
 
-    - name: Login to Docker Hub
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_HUB_USER }}
-        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-   
-    - name: Build with Maven and Deploy into Docker Hub
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: mvn spring-boot:build-image "-Dspring-boot.build-image.imageName=${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}" --file pom.xml
+      - name: Build with Maven (no deploy)
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'RC') }}
+        run: mvn -B package --file pom.xml
 
-    - name: Build with Maven
-      if: ${{ !contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: mvn -B package --file pom.xml
-   
-    # 4️⃣ Faz push da imagem Docker para o Docker Hub
-    - name: Push Docker Image with RC Tag
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: docker push $IMAGE_NAME:${{ steps.rc_version.outputs.rc_version }}
+      # 4️⃣ Push da imagem Docker para o Docker Hub (adaptado para nativo)
+      - name: Push Native Docker Image with RC Tag
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && contains(github.event.pull_request.labels.*.name, 'native') }}
+        run: docker push $IMAGE_NAME:${{ steps.rc_version.outputs.rc_version }}-native
 
-    # 5️⃣ (Opcional) Cria a tag RC no GitHub
-    - name: Create Git Tag
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
+      - name: Push Regular Docker Image with RC Tag
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && !contains(github.event.pull_request.labels.*.name, 'native') }}
+        run: docker push $IMAGE_NAME:${{ steps.rc_version.outputs.rc_version }}
 
-        git tag ${{ steps.rc_version.outputs.rc_version }}
-        git push origin ${{ steps.rc_version.outputs.rc_version }}
+      # 5️⃣ (Opcional) Cria a tag RC no GitHub
+      - name: Create Git Tag
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag ${{ steps.rc_version.outputs.rc_version }}
+          git push origin ${{ steps.rc_version.outputs.rc_version }}
 
-    # 6️⃣ Comenta no PR com a versão RC criada
-    - name: Comment RC Version on PR
-      if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') }}
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        message: |
-          🚀 New Release Candidate Version generated: `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}`
-          📦 Docker image published:
-          `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}`
+      # 6️⃣ Comenta no PR com a versão RC criada (adaptado para nativo)
+      - name: Comment RC Version on PR (Native)
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && contains(github.event.pull_request.labels.*.name, 'native') }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            🚀 New **NATIVE** Release Candidate Version generated: `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}-native`
+            📦 Native Docker image published:
+            `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}-native`
+            
+            ⚡ **Native Benefits:**
+            - Faster startup time (milliseconds)
+            - Lower memory consumption 
+            - Smaller runtime footprint
+
+      - name: Comment RC Version on PR (Regular)
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'RC') && !contains(github.event.pull_request.labels.*.name, 'native') }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            🚀 New Release Candidate Version generated: `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}`
+            📦 Docker image published:
+            `${{ env.IMAGE_NAME }}:${{ steps.rc_version.outputs.rc_version }}`
