@@ -193,6 +193,15 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>lang/messages*</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <profiles>
@@ -266,4 +275,5 @@
             </build>
         </profile>
     </profiles>
+
 </project>
