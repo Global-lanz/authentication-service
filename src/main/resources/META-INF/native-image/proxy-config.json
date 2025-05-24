@@ -1,0 +1,11 @@
+[
+  {
+    "interfaces": ["org.mockito.plugins.PluginSwitch"]
+  },
+  {
+    "interfaces": ["org.mockito.plugins.MockMaker"]
+  },
+  {
+    "interfaces": ["org.springframework.test.context.TestExecutionListener"]
+  }
+]

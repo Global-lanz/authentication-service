@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.0</version>
+        <version>3.4.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>lanz.global</groupId>
     <artifactId>authentication-service</artifactId>
-    <version>1.8.1</version>
+    <version>1.9.0</version>
     <name>authentication-service</name>
     <description>authentication-service</description>
     <url/>
@@ -28,7 +28,9 @@
     </scm>
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
+        <repackage.classifier/>
+        <native-buildtools.version>0.10.3</native-buildtools.version>
     </properties>
     <dependencies>
         <dependency>
@@ -107,7 +109,29 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <optional>true</optional>
+        </dependency>
 
+        <!-- Dependência para testes nativos -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Mockito para testes nativos -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -153,6 +177,13 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <classifier>${repackage.classifier}</classifier>
+                    <image>
+                        <builder>paketobuildpacks/builder-jammy-base:latest</builder>
+                        <env>
+                            <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                        </env>
+                    </image>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -164,4 +195,75 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>native</id>
+            <properties>
+                <repackage.classifier>exec</repackage.classifier>
+                <native-buildtools.version>0.10.3</native-buildtools.version>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- Plugin GraalVM Native Build Tools -->
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <version>${native-buildtools.version}</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <fallback>false</fallback>
+                            <verbose>true</verbose>
+                            <imageName>${project.artifactId}</imageName>
+                            <buildArgs>
+                                <!-- Configurações básicas de build -->
+                                <buildArg>--no-fallback</buildArg>
+                                <buildArg>--report-unsupported-elements-at-runtime</buildArg>
+                                <buildArg>--allow-incomplete-classpath</buildArg>
+
+                                <!-- Otimizações de memória e performance -->
+                                <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
+                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                                <buildArg>-H:+AddAllCharsets</buildArg>
+                                <buildArg>-H:+AllowVMInspection</buildArg>
+
+                                <!-- Configurações específicas para Spring Boot -->
+                                <buildArg>--initialize-at-build-time=org.slf4j.LoggerFactory</buildArg>
+                                <buildArg>--initialize-at-build-time=ch.qos.logback</buildArg>
+                                <buildArg>--initialize-at-build-time=org.apache.commons.logging.LogFactory</buildArg>
+                                <buildArg>--initialize-at-build-time=org.springframework.util.unit.DataSize</buildArg>
+
+                                <!-- Suporte para protocolos e recursos -->
+                                <buildArg>--enable-url-protocols=http,https</buildArg>
+                                <buildArg>--enable-all-security-services</buildArg>
+
+                                <!-- Configurações para JPA/Hibernate -->
+                                <buildArg>--initialize-at-build-time=org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider</buildArg>
+
+                                <!-- Configurações para Kafka (se necessário) -->
+                                <buildArg>--initialize-at-run-time=org.apache.kafka</buildArg>
+
+                                <!-- Configurações para JWT -->
+                                <buildArg>--initialize-at-run-time=com.auth0.jwt</buildArg>
+
+                                <!-- Configurações de memória -->
+                                <buildArg>-J-Xmx8g</buildArg>
+                            </buildArgs>
+                            <systemProperties>
+                                <spring.spel.ignore>true</spring.spel.ignore>
+                                <spring.xml.ignore>true</spring.xml.ignore>
+                            </systemProperties>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>add-reachability-metadata</id>
+                                <goals>
+                                    <goal>add-reachability-metadata</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
