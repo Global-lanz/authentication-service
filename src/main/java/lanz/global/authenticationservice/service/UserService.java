@@ -67,7 +67,7 @@ public class UserService implements UserDetailsService {
     private final ServiceConfig config;
 
     private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$");
-    private static final String ACTIVATE_USER_URL = "%s/user/activation/%s";
+    private static final String ACTIVATE_USER_URL = "%s/authentication/activation/%s";
     private static final String PASSWORD_RECOVERY_URL = "%s/user/password/%s";
 
     @Override
