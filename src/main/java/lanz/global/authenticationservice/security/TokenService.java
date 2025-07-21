@@ -19,7 +19,7 @@ import java.util.List;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TokenService {
 
     private final ServiceConfig config;

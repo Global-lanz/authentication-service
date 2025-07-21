@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ServiceConverter {
 
     private final ConversionService conversionService;
