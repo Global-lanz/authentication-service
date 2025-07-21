@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/authentication/user/activation").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/password-recovery/request").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/password-recovery/activation").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/index.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health-check/**").permitAll()
                         .anyRequest().authenticated()

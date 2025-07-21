@@ -1,4 +1,4 @@
-package lanz.global.customerservice.security;
+package lanz.global.authenticationservice.security;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
