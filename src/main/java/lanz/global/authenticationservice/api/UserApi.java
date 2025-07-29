@@ -1,5 +1,6 @@
 package lanz.global.authenticationservice.api;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -7,6 +8,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
+import lanz.global.authenticationservice.api.request.m2m.ServiceAuthenticationRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActivationRequest;
@@ -14,6 +16,7 @@ import lanz.global.authenticationservice.api.request.user.PasswordRecoveryReques
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.api.request.usergroup.LinkUserAccountToUserGroupsRequest;
 import lanz.global.authenticationservice.api.response.login.LoginResponse;
+import lanz.global.authenticationservice.api.response.m2m.ServiceAuthenticationResponse;
 import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUserAccountResponse;
 import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUserAccountsResponse;
 import lanz.global.authenticationservice.api.response.useraccount.GetUserAccountResponse;
@@ -59,6 +62,13 @@ public class UserApi {
     public ResponseEntity<LoginResponse> login(
             @Schema(description = "The request body") @Valid @RequestBody LoginRequest request) {
         LoginResponse response = new LoginResponse(userService.login(request));
+        return ResponseEntity.ok(response);
+    }
+
+    @Hidden
+    @PostMapping("/m2m/authentication")
+    public ResponseEntity<ServiceAuthenticationResponse> serviceAuthentication(@Valid @RequestBody ServiceAuthenticationRequest request) {
+        ServiceAuthenticationResponse response = new ServiceAuthenticationResponse(userService.serviceAuthentication(request));
         return ResponseEntity.ok(response);
     }
 
