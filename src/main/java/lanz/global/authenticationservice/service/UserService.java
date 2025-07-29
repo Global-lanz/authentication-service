@@ -2,6 +2,7 @@ package lanz.global.authenticationservice.service;
 
 import lanz.global.authenticationservice.api.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
+import lanz.global.authenticationservice.api.request.m2m.ServiceAuthenticationRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActivationRequest;
@@ -19,6 +20,7 @@ import lanz.global.authenticationservice.model.UserGroup;
 import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
+import lanz.global.authenticationservice.security.ServiceAuthenticationToken;
 import lanz.global.authenticationservice.security.TokenService;
 import lanz.global.authenticationservice.util.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -191,6 +193,18 @@ public class UserService implements UserDetailsService {
         userAccount.setLockoutTime(null);
 
         userRepository.save(userAccount);
+    }
+
+    public String serviceAuthentication(ServiceAuthenticationRequest request) {
+        validateServiceAuthentication(request);
+
+        return tokenService.generateToken(request);
+    }
+
+    private void validateServiceAuthentication(ServiceAuthenticationRequest request) {
+        if (!config.getSecurity().getServiceSecret().equals(request.password()) || !config.getSecurity().getAuthorizedServices().contains(request.serviceName())) {
+            throw new ExpiredTokenException();
+        }
     }
 
     private void validatePasswordRecoveryActivation(PasswordRecoveryActivationRequest request, UserAccount userAccount) {

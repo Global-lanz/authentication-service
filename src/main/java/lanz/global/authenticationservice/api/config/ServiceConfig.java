@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ConfigurationProperties("gl.service.config")
@@ -14,6 +16,14 @@ public class ServiceConfig {
     @Getter
     @Setter
     public static class Security {
+
+        private Long tokenExpiration;
+        private String serviceSecret;
+        private String tokenExpirationUnit;
+        private Long serviceTokenExpiration;
+        private String serviceTokenExpirationUnit;
+        private List<String> authorizedServices;
+
         private String apiSecret;
         private String originAllowed;
         private String basicUser;
