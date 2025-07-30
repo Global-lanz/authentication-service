@@ -1,5 +1,5 @@
 package lanz.global.authenticationservice.api.response.m2m;
 
-public record ServiceAuthenticationResponse(String token) {
+public record ServiceAuthenticationResponse(String accessToken) {
 
 }

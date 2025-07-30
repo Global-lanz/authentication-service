@@ -66,7 +66,7 @@ public class UserApi {
     }
 
     @Hidden
-    @PostMapping("/m2m/authentication")
+    @PostMapping("/m2m/login")
     public ResponseEntity<ServiceAuthenticationResponse> serviceAuthentication(@Valid @RequestBody ServiceAuthenticationRequest request) {
         ServiceAuthenticationResponse response = new ServiceAuthenticationResponse(userService.serviceAuthentication(request));
         return ResponseEntity.ok(response);

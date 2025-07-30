@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -32,24 +33,21 @@ public class SecurityFilter extends OncePerRequestFilter {
 
             if (isBearerAuthentication(header)) {
                 String token = header.replace("Bearer ", "");
-
-                if (isServiceAuthentication(token)) {
-                    String serviceName = tokenService.getServiceNameFromToken(token);
-
-                    ServiceAuthenticationToken authentication =
-                            new ServiceAuthenticationToken(serviceName, token);
-
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
+                Authentication authentication = null;
+                if (tokenService.isUserToken(token)) {
                     String email = tokenService.validateToken(token);
-
                     Optional<UserAccount> userOptional = userRepository.findByEmail(email);
                     if (userOptional.isPresent()) {
                         UserAccount userAccount = userOptional.get();
-                        var authentication = new UsernamePasswordAuthenticationToken(userAccount, null, userAccount.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-
+                        authentication = new UsernamePasswordAuthenticationToken(userAccount, null, userAccount.getAuthorities());
                     }
+                } else if (tokenService.isServiceToken(token)) {
+                    String serviceName = tokenService.getServiceNameFromToken(token);
+                    authentication = new ServiceAuthenticationToken(serviceName, token);
+                }
+
+                if (authentication != null) {
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
 
             }
@@ -57,10 +55,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             handlerExceptionResolver.resolveException(request, response, null, e);
         }
-    }
-
-    private boolean isServiceAuthentication(String token) {
-        return tokenService.validateServiceToken(token);
     }
 
     private boolean isBearerAuthentication(String token) {

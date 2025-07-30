@@ -196,16 +196,9 @@ public class UserService implements UserDetailsService {
     }
 
     public String serviceAuthentication(ServiceAuthenticationRequest request) {
-        validateServiceAuthentication(request);
-
-        return tokenService.generateToken(request);
+        return tokenService.generateToken(request.serviceName(), request.serviceSecret());
     }
 
-    private void validateServiceAuthentication(ServiceAuthenticationRequest request) {
-        if (!config.getSecurity().getServiceSecret().equals(request.password()) || !config.getSecurity().getAuthorizedServices().contains(request.serviceName())) {
-            throw new ExpiredTokenException();
-        }
-    }
 
     private void validatePasswordRecoveryActivation(PasswordRecoveryActivationRequest request, UserAccount userAccount) {
         if (LocalDateTime.now().isAfter(userAccount.getResetPasswordExpires())) {
