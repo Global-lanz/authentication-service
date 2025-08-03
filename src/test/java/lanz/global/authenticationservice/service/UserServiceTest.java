@@ -1,6 +1,6 @@
 package lanz.global.authenticationservice.service;
 
-import lanz.global.authenticationservice.api.config.ServiceConfig;
+import lanz.global.authenticationservice.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.user.RegistrationRequest;
 import lanz.global.authenticationservice.exception.BadRequestException;
 import lanz.global.authenticationservice.exception.UserAlreadyExistsException;

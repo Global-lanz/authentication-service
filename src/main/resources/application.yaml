@@ -49,9 +49,15 @@ gl:
   service:
     config:
       security:
+        service-secret: abc123
         api-secret: abc123
         password-recovery:
           expires: 7
           unit: DAYS
         login-attempts: 7
+        token-expiration: 1
+        token-expiration-unit: DAYS
+        service-token-expiration: 2
+        service-token-expiration-unit: HOURS
+        authorized-services:
       frontend-url: "http://localhost:4200/"
