@@ -1,6 +1,6 @@
 package lanz.global.authenticationservice.service;
 
-import lanz.global.authenticationservice.api.config.ServiceConfig;
+import lanz.global.authenticationservice.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
 import lanz.global.authenticationservice.api.request.m2m.ServiceAuthenticationRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
@@ -20,7 +20,6 @@ import lanz.global.authenticationservice.model.UserGroup;
 import lanz.global.authenticationservice.repository.RuleRepository;
 import lanz.global.authenticationservice.repository.UserGroupRepository;
 import lanz.global.authenticationservice.repository.UserRepository;
-import lanz.global.authenticationservice.security.ServiceAuthenticationToken;
 import lanz.global.authenticationservice.security.TokenService;
 import lanz.global.authenticationservice.util.MessageService;
 import lombok.RequiredArgsConstructor;

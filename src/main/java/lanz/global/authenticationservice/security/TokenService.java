@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import lanz.global.authenticationservice.api.config.ServiceConfig;
+import lanz.global.authenticationservice.config.ServiceConfig;
 import lanz.global.authenticationservice.exception.ExpiredTokenException;
 import lanz.global.authenticationservice.model.Rule;
 import lanz.global.authenticationservice.model.UserAccount;

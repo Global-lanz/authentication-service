@@ -1,4 +1,4 @@
-package lanz.global.authenticationservice.api.config;
+package lanz.global.authenticationservice.config;
 
 import lombok.Getter;
 import lombok.Setter;
