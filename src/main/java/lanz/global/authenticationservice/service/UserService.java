@@ -195,7 +195,7 @@ public class UserService implements UserDetailsService {
     }
 
     public String serviceAuthentication(ServiceAuthenticationRequest request) {
-        return tokenService.generateToken(request.serviceName(), request.serviceSecret());
+        return tokenService.generateToken(request.serviceName(), request.apiSecret());
     }
 
 

@@ -18,7 +18,6 @@ public class ServiceConfig {
     public static class Security {
 
         private Long tokenExpiration;
-        private String serviceSecret;
         private String tokenExpirationUnit;
         private Long serviceTokenExpiration;
         private String serviceTokenExpirationUnit;

@@ -68,8 +68,8 @@ public class TokenService {
         }
     }
 
-    public String generateToken(String serviceName, String serviceSecret) {
-        validateServiceAuthentication(serviceName, serviceSecret);
+    public String generateToken(String serviceName, String apiSecret) {
+        validateServiceAuthentication(serviceName, apiSecret);
 
         Algorithm algorithm = Algorithm.HMAC256(config.getSecurity().getApiSecret());
 
@@ -80,7 +80,6 @@ public class TokenService {
                 .withExpiresAt(getServiceExpireDate())
                 .withClaim("RULES", List.of(Rules.M2M))
                 .withClaim(CLAIM_TYPE, SERVICE_TYPE)
-                .withClaim(SERVICE_CLAIM, serviceName)
                 .sign(algorithm);
     }
 
@@ -120,8 +119,8 @@ public class TokenService {
         }
     }
 
-    private void validateServiceAuthentication(String serviceName, String serviceSecret) {
-        if (!config.getSecurity().getServiceSecret().equals(serviceSecret) || !config.getSecurity().getAuthorizedServices().contains(serviceName)) {
+    private void validateServiceAuthentication(String serviceName, String apiSecret) {
+        if (!config.getSecurity().getApiSecret().equals(apiSecret) || !config.getSecurity().getAuthorizedServices().contains(serviceName)) {
             throw new ExpiredTokenException();
         }
     }
