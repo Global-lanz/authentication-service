@@ -1,8 +1,10 @@
-package lanz.global.authenticationservice.api.config;
+package lanz.global.authenticationservice.config;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +16,13 @@ public class ServiceConfig {
     @Getter
     @Setter
     public static class Security {
+
+        private Long tokenExpiration;
+        private String tokenExpirationUnit;
+        private Long serviceTokenExpiration;
+        private String serviceTokenExpirationUnit;
+        private List<String> authorizedServices;
+
         private String apiSecret;
         private String originAllowed;
         private String basicUser;
