@@ -1,7 +1,8 @@
 package lanz.global.authenticationservice.service;
 
-import lanz.global.authenticationservice.api.config.ServiceConfig;
+import lanz.global.authenticationservice.config.ServiceConfig;
 import lanz.global.authenticationservice.api.request.invite.InviteRequest;
+import lanz.global.authenticationservice.api.request.m2m.ServiceAuthenticationRequest;
 import lanz.global.authenticationservice.api.request.user.ActivationRequest;
 import lanz.global.authenticationservice.api.request.user.LoginRequest;
 import lanz.global.authenticationservice.api.request.user.PasswordRecoveryActivationRequest;
@@ -192,6 +193,11 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(userAccount);
     }
+
+    public String serviceAuthentication(ServiceAuthenticationRequest request) {
+        return tokenService.generateToken(request.serviceName(), request.apiSecret());
+    }
+
 
     private void validatePasswordRecoveryActivation(PasswordRecoveryActivationRequest request, UserAccount userAccount) {
         if (LocalDateTime.now().isAfter(userAccount.getResetPasswordExpires())) {

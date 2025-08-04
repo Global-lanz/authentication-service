@@ -1,6 +1,6 @@
 package lanz.global.authenticationservice;
 
-import lanz.global.authenticationservice.api.config.ServiceConfig;
+import lanz.global.authenticationservice.config.ServiceConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
