@@ -1,6 +1,8 @@
 package lanz.global.authenticationservice.api.config;
 
-public abstract class Rules {
+public final class Rules {
+
+    public static final String M2M = "M2M";
 
     public static final String INVITE_USER = "INVITE_USER";
     public static final String LIST_COMPANY_USERS = "LIST_COMPANY_USERS";

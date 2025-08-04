@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/authentication/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/authentication/m2m/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/authentication/currency").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/activation").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/password-recovery/request").permitAll()
