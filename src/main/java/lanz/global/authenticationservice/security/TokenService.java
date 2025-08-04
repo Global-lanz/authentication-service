@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.config.ServiceConfig;
 import lanz.global.authenticationservice.exception.ExpiredTokenException;
 import lanz.global.authenticationservice.model.Rule;
@@ -77,6 +78,7 @@ public class TokenService {
                 .withIssuer("auth")
                 .withSubject(serviceName)
                 .withExpiresAt(getServiceExpireDate())
+                .withClaim("RULES", List.of(Rules.M2M))
                 .withClaim(CLAIM_TYPE, SERVICE_TYPE)
                 .withClaim(SERVICE_CLAIM, serviceName)
                 .sign(algorithm);
