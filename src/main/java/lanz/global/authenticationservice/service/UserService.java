@@ -49,7 +49,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     private final TokenService tokenService;

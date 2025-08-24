@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Log4j2
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class NotificationService {
 
     public static final String NOTIFICATION_TOPIC = "notification-topic";

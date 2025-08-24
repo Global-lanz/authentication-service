@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Log4j2
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UserGroupService {
 
     private final UserGroupRepository userGroupRepository;

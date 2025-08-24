@@ -24,7 +24,7 @@ import java.util.List;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class TokenService {
 
     private static final String CLAIM_TYPE = "type";

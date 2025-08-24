@@ -23,7 +23,7 @@ import java.util.Locale;
 
 @Log4j2
 @ControllerAdvice
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final MessageSource messageSource;

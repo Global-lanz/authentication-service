@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/authentication/user/activation").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/password-recovery/request").permitAll()
                         .requestMatchers(HttpMethod.POST, "/authentication/user/password-recovery/activation").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui/index.html").permitAll()
                         .requestMatchers(HttpMethod.GET, "/v3/api-docs").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health-check/**").permitAll()
                         .anyRequest().authenticated()

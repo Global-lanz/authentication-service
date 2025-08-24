@@ -40,7 +40,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/authentication")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class UserApi {
 
     private final UserService userService;

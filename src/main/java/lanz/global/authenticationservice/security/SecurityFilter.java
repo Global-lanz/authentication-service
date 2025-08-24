@@ -18,7 +18,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class SecurityFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;

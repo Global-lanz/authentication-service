@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.nio.ByteBuffer;
 
 @Component
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class FeignErrorDecoder {
 
     private final ObjectMapper objectMapper;

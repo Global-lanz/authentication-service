@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/authentication/rule")
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class RulesApi {
 
     private final UserGroupService userGroupService;
