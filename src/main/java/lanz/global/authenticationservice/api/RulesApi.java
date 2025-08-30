@@ -7,7 +7,7 @@ import lanz.global.authenticationservice.api.config.Rules;
 import lanz.global.authenticationservice.api.response.usergroup.RuleResponse;
 import lanz.global.authenticationservice.model.Rule;
 import lanz.global.authenticationservice.service.UserGroupService;
-import lanz.global.authenticationservice.util.converter.ServiceConverter;
+import lanz.global.libraryservice.converter.component.ServiceConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
