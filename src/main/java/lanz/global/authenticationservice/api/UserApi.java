@@ -22,7 +22,7 @@ import lanz.global.authenticationservice.api.response.useraccount.GetCompanyUser
 import lanz.global.authenticationservice.api.response.useraccount.GetUserAccountResponse;
 import lanz.global.authenticationservice.service.UserGroupService;
 import lanz.global.authenticationservice.service.UserService;
-import lanz.global.authenticationservice.util.converter.ServiceConverter;
+import lanz.global.libraryservice.converter.component.ServiceConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

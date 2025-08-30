@@ -4,6 +4,7 @@ import lanz.global.authenticationservice.api.response.usergroup.RuleResponse;
 import lanz.global.authenticationservice.api.response.usergroup.UserGroupResponse;
 import lanz.global.authenticationservice.api.response.usergroup.UserGroupRulesResponse;
 import lanz.global.authenticationservice.model.UserGroup;
+import lanz.global.libraryservice.converter.component.ServiceConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
