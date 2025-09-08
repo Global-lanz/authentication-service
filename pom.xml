@@ -110,7 +110,7 @@
         <dependency>
             <groupId>lanz.global</groupId>
             <artifactId>library-service</artifactId>
-            <version>RC.20250908.001</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
