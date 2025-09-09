@@ -6,9 +6,7 @@ on:
 
 jobs:
   build-and-publish:
-    permissions:
-      packages: read
-      repository-projects: read
+    permissions: write-all
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: maiconlanzendorf/authentication-service
